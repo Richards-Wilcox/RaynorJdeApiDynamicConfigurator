@@ -476,6 +476,8 @@ public class ConceptService : IConceptService
         OrderItem orderItem1;
         OrderItem orderItem2;
         OrderItem orderItem3;
+        OrderItem orderItem4;
+        OrderItem orderItem5;
         LotNumberReturn lot;
         Configuration configuration = null;
         DoorItem doorItem = null;
@@ -1981,23 +1983,6 @@ public class ConceptService : IConceptService
                                         ewOrder.Var25.Add(itemMaster.VAR_25 + "~" + linenum.ToString());
                                     }
                                 }                               
-                                //if (lotflag) lotflag = false; // Only get the lot number for the door item
-                                //if (orderItem.Discount != 0)
-                                //{
-                                //    discountItem = new OrderItem()
-                                //    {
-                                //        ItemNum = discountItemNum,
-                                //        Description = orderItem.Discount  + "% Discount",
-                                //        UnitPrice = -(bom2.DISCOUNT_AMT),
-                                //        Quantity = bom2.QUANTITY,
-                                //        LineNum = line++,
-                                //        RefLineNum = orderItem.LineNum,
-                                //        LineType = "PD",
-                                //        LotNumber = lotnumber
-                                //    };
-                                //}
-                                // If a door item add the door details to the item
-                                //if (itemMaster.VAR_18 == "Y" && validYLineParts.Contains(itemMaster.ITEM_NUM))
                                 if (validYLineParts.Contains(itemMaster.ITEM_NUM)) // If the door item get VAR_25
                                 {
                                     orderItem1.Door = new DoorInfo()
@@ -2067,21 +2052,6 @@ public class ConceptService : IConceptService
                                             lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
                                             orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
                                             line = linenum;
-                                            //if (discount != 0)
-                                            //{
-                                            //    ewOrder.Items.Add(new OrderItem()
-                                            //    {
-                                            //        ItemNum = discountItemNum,
-                                            //        Description = discount + "% Discount",
-                                            //        UnitPrice = -(bom3.DISCOUNT_AMT),
-                                            //        Quantity = bom3.QUANTITY,
-                                            //        LineNum = line++,
-                                            //        RefLineNum = linenum,
-                                            //        LineType = "PD",
-                                            //        LotNumber = orderItem.LotNumber
-                                            //    });
-                                            //}
-                                            // Add the bom data
                                             if (bom2.ITEM_NUM.Trim().ToLower() != "comment")
                                             {
                                                 orderItem1.BOMs.Add(new BOM() { ItemNum = bom2.ITEM_NUM, Quantity = bom2.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom1.ITEM_NUM, CutInstructions = new List<string>() });
@@ -2098,7 +2068,6 @@ public class ConceptService : IConceptService
                                                         easyweblinetype = adderPrefix.Any(x => bom3.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                         linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom3.ITEM_NUM + "'");
                                                         lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
-                                                        orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, false, out linenum);
                                                         line = linenum;
                                                         // Add the bom data
                                                         if (bom3.ITEM_NUM.Trim().ToLower() != "comment")
@@ -2112,10 +2081,46 @@ public class ConceptService : IConceptService
                                                             {
                                                                 if (bom4.ITEM_NUM.Trim().ToLower() != "comment")
                                                                 {
+                                                                    // Add the component
+                                                                    itemMaster = detail.ItemMaster.Where(x => x.ITEM_NUM == bom4.ITEM_NUM).FirstOrDefault();
+                                                                    easyweblinetype = adderPrefix.Any(x => bom4.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
+                                                                    linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom4.ITEM_NUM + "'");
+                                                                    lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
+                                                                    orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                                                    line = linenum;
                                                                     // Add the bom data
-                                                                    orderItem3.BOMs.Add(new BOM() { ItemNum = bom4.ITEM_NUM, Quantity = bom4.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom3.ITEM_NUM, CutInstructions = new List<string>() });
-                                                                }
-                                                            }
+                                                                    if (bom4.ITEM_NUM.Trim().ToLower() != "comment")
+                                                                    {
+                                                                        // Add the bom data
+                                                                        orderItem3.BOMs.Add(new BOM() { ItemNum = bom4.ITEM_NUM, Quantity = bom4.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom3.ITEM_NUM, CutInstructions = new List<string>() });
+                                                                    }
+
+                                                                    if (bom4.Bom1 != null)
+                                                                    {
+                                                                        foreach (var bom5 in bom4.Bom1)
+                                                                        {
+                                                                            if (bom5.ITEM_NUM.Trim().ToLower() != "comment")
+                                                                            {
+                                                                                // Add the component
+                                                                                itemMaster = detail.ItemMaster.Where(x => x.ITEM_NUM == bom5.ITEM_NUM).FirstOrDefault();
+                                                                                easyweblinetype = adderPrefix.Any(x => bom5.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
+                                                                                linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom5.ITEM_NUM + "'");
+                                                                                lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
+                                                                                orderItem5 = GetOrderItem(bom5, itemMaster, bom4.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                                                                line = linenum;
+                                                                                // Add the bom data
+                                                                                if (bom5.ITEM_NUM.Trim().ToLower() != "comment")
+                                                                                {
+                                                                                    // Add the bom data
+                                                                                    orderItem4.BOMs.Add(new BOM() { ItemNum = bom5.ITEM_NUM, Quantity = bom5.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom4.ITEM_NUM, CutInstructions = new List<string>() });
+                                                                                }
+                                                                                doorItem.Items.Add(orderItem5);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    doorItem.Items.Add(orderItem4);
+                                                                }                                                               
+                                                            }                                                         
                                                         }
                                                         doorItem.Items.Add(orderItem3);
                                                     }
@@ -2183,20 +2188,6 @@ public class ConceptService : IConceptService
                 linetype = adderPrefix.Any(x => detail.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                 orderItem3 = GetOrderItem(null, itemMaster, "", detail, ewOrder, configuration, adderPrefix, "", linetype, linetype, line, doornum, false, true, out linenum);
                 line = linenum;
-                //if (discount != 0)
-                //{
-                //    ewOrder.Items.Add(new OrderItem()
-                //    {
-                //        ItemNum = discountItemNum,
-                //        Description = discount + "% Discount",
-                //        UnitPrice = -(detail.DISCOUNT_AMT),
-                //        Quantity = detail.QUANTITY,
-                //        LineNum = line++,
-                //        RefLineNum = linenum,
-                //        LineType = "PD",
-                //        LotNumber = ""
-                //    });
-                //}
                 doorItem.Items.Add(orderItem3);
             }
         }
@@ -2221,7 +2212,6 @@ public class ConceptService : IConceptService
         string stockingtype = itemMaster.VAR_21;
         string itemweight = "";
 
-        // For development get item details from the database
         if (_environment == "dev")
         {
             // Get line, stocking type and item weight from item master database and override the line type from Var_18
@@ -2232,7 +2222,6 @@ public class ConceptService : IConceptService
                 stockingtype = _db.DSet.Tables["Item"].Rows[0][1].ToString().Trim();
                 itemweight = _db.DSet.Tables["Item"].Rows[0][2].ToString().Trim();
             }
-        }
 
         // If item weight not in item master database use weight from easy web
         if (string.IsNullOrEmpty(itemweight))
@@ -2759,7 +2748,6 @@ public class ConceptService : IConceptService
                     switch (_environment)
                     {
                         // Set item values from database when in development mode
-                        case "dev":
                             if (_db.GetTable("SELECT stkCode,SalesCat1,SalesCat2,SalesCat3,salesCat4,mpfPrp1,lnType,stkgType,buyerCdJde,leadTime,stkRunCd,mpfPrp4,VendorNum FROM dbo.SysproToJdeItemMaster WHERE stkCode='" + orderItem.ItemNum + "'", "Item") > 0) // Get stockcode details from database
                             {
                                 uom = _syspro.GetField("SELECT StockUom FROM dbo.InvMaster WHERE StockCode='" + orderItem.ItemNum + "'").Trim();
@@ -2801,7 +2789,6 @@ public class ConceptService : IConceptService
                                     glClass = "5YLN";
                                 }
                             }
-                            break;
                         // For production mode set item values from the easyweb data
                         case "jde":
                             uom = orderItem.UOM;
@@ -3043,6 +3030,8 @@ public class ConceptService : IConceptService
         OrderItem orderItem1;
         OrderItem orderItem2;
         OrderItem orderItem3;
+        OrderItem orderItem4;
+        OrderItem orderItem5;
         // Get parts to exclude from bom and routing from the configuration file
         string[] pctExclude = _configuration.GetValue<string>("AppSettings:PctPartExclude").Split(',');
         // For development 
@@ -3180,9 +3169,79 @@ public class ConceptService : IConceptService
                                                 }
                                                 if (!item3.ItemNum.StartsWith("Cut To Instruction") && !item3.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item3.ItemNum.StartsWith(x)))
                                                 {
-                                                    if (orderItem3.Add == true)
                                                     {
                                                         AddBom("", orderItem3, item3.ItemNum, apiUrl);
+                                                    }
+                                                }
+                                                if (item3.BOMs != null)
+                                                {
+                                                    if (item3.BOMs.Count > 0)
+                                                    {
+                                                        // Add fourth level bom items to JDE
+                                                        foreach (var item4 in item3.BOMs)
+                                                        {
+                                                            orderItem4 = doorItem.Items.Where(x => x.ItemNum == item4.ItemNum).FirstOrDefault();
+                                                            if (orderItem4 == null)
+                                                            {
+                                                                itemQuery = new ItemQuery() { ItemArray = new List<Item>(), webOrderNbr = "", configurationNbr = 0 };
+                                                                itemQuery.ItemArray.Add(new Item { szIdentifier2ndItem = item4.ItemNum });
+                                                                string json = JsonConvert.SerializeObject(itemQuery);
+                                                                // Call JDE to get item data
+                                                                result = SendWebApiMessage(apiUrl + "N554130", json).Result;
+                                                                if (result != null)
+                                                                {
+                                                                    items = JsonConvert.DeserializeObject<ItemQueryReturn>(result);
+                                                                    orderItem4 = new OrderItem { ItemNum = items.N554130_Repeating[0].szIdentifier2ndItem, ShortItemNum = Convert.ToInt32(items.N554130_Repeating[0].szIdentifierShortItem) };
+                                                                }
+                                                                else
+                                                                {
+                                                                    orderItem4 = new OrderItem { ItemNum = item3.ItemNum, ShortItemNum = 0 };
+                                                                }
+                                                            }
+                                                            if (!item4.ItemNum.StartsWith("Cut To Instruction") && !item4.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item4.ItemNum.StartsWith(x)))
+                                                            {
+                                                                //if (orderItem4.Add == true)
+                                                                {
+                                                                    AddBom("", orderItem4, item4.ItemNum, apiUrl);
+                                                                }
+                                                            }
+                                                           if(item4.BOMs != null)
+                                                            {
+                                                                if(item4.BOMs.Count > 0)
+                                                                {
+                                                                    // Add fifth level item to JDE
+                                                                    foreach (var item5 in item4.BOMs)
+                                                                    {
+                                                                        orderItem5 = doorItem.Items.Where(x => x.ItemNum == item5.ItemNum).FirstOrDefault();
+                                                                        if (orderItem5 == null)
+                                                                        {
+                                                                            itemQuery = new ItemQuery() { ItemArray = new List<Item>(), webOrderNbr = "", configurationNbr = 0 };
+                                                                            itemQuery.ItemArray.Add(new Item { szIdentifier2ndItem = item5.ItemNum });
+                                                                            string json = JsonConvert.SerializeObject(itemQuery);
+                                                                            // Call JDE to get item data
+                                                                            result = SendWebApiMessage(apiUrl + "N554130", json).Result;
+                                                                            if (result != null)
+                                                                            {
+                                                                                items = JsonConvert.DeserializeObject<ItemQueryReturn>(result);
+                                                                                orderItem5 = new OrderItem { ItemNum = items.N554130_Repeating[0].szIdentifier2ndItem, ShortItemNum = Convert.ToInt32(items.N554130_Repeating[0].szIdentifierShortItem) };
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                orderItem5 = new OrderItem { ItemNum = item4.ItemNum, ShortItemNum = 0 };
+                                                                            }
+                                                                        }
+                                                                        if (!item5.ItemNum.StartsWith("Cut To Instruction") && !item5.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item5.ItemNum.StartsWith(x)))
+                                                                        {
+                                                                            //if (orderItem4.Add == true)
+                                                                            {
+                                                                                AddBom("", orderItem5, item5.ItemNum, apiUrl);
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -3486,7 +3545,7 @@ public class ConceptService : IConceptService
             strReasonCodes = " ";
         }
         *///endys
-
+      
         // Format ship date for jde order
         if (!string.IsNullOrWhiteSpace(ewOrder.ShipDate))
         {
@@ -3505,6 +3564,7 @@ public class ConceptService : IConceptService
             foreach (var item in doorItem.Items)
             {
                 item.AddItemDetail = true;
+               
                 if (!item.ItemNum.StartsWith("Cut To Instruction") && !item.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item.ItemNum.StartsWith(x)))
                 {
                     // Exclude items for Milestone
