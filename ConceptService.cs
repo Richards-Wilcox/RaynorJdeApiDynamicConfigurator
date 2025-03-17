@@ -42,7 +42,7 @@ public class ConceptService : IConceptService
     private ConceptAccessService.Order order1;
 
     private string strOrderStatus = "";
-    private  string strReasonCodes = "";
+    private string strReasonCodes = "";
     private string strOrderStatusPre = "";
     private string strOrderType = "";
     private string strSPR;
@@ -96,7 +96,7 @@ public class ConceptService : IConceptService
             // Easyweb endpoint for development
             conceptAccess.Endpoint.Address = new System.ServiceModel.EndpointAddress(_configuration.GetValue<string>("AppSettings:EasyWebEnvDev"));
         }
-        else if(_environment == "test")
+        else if (_environment == "test")
         {
             conceptAccess.Endpoint.Address = new System.ServiceModel.EndpointAddress(_configuration.GetValue<string>("AppSettings:EasyWebEnvTest"));
         }
@@ -105,7 +105,7 @@ public class ConceptService : IConceptService
             // Easyweb endpoint for production
             conceptAccess.Endpoint.Address = new System.ServiceModel.EndpointAddress(_configuration.GetValue<string>("AppSettings:EasyWebEnvProd"));
             conceptAccess.Endpoint.Binding.SendTimeout = TimeSpan.FromMinutes(10);
-            
+
 
         }
 
@@ -120,7 +120,7 @@ public class ConceptService : IConceptService
             strOrderType = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'Order_Type'");
             strSPR = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'SPR'");
 
-           
+
 
             strOrderStatus = strOrderStatusPre == "" ? "SO" : strOrderStatusPre;
 
@@ -141,7 +141,7 @@ public class ConceptService : IConceptService
         // Check for customer po and a valid bill to and ship to and stop processing if empty
         // YS - UNCOMMENT AFTER TEST
         if (!string.IsNullOrWhiteSpace(ewOrder.CustomerPo) && !string.IsNullOrWhiteSpace(ewOrder.CustomerCode) && ewOrder.CustomerCode.StartsWith("8") && !string.IsNullOrWhiteSpace(ewOrder.ShipTo) && ewOrder.ShipTo.StartsWith("8") && ewOrder.ShipDate != "error")
-       //  if (!string.IsNullOrWhiteSpace(ewOrder.CustomerPo))
+        //  if (!string.IsNullOrWhiteSpace(ewOrder.CustomerPo))
         {
             OrderInfo orderInfo = null;
             // Get next order document, batch and invoice numbers from JDE
@@ -154,7 +154,7 @@ public class ConceptService : IConceptService
                 //ewOrder.SPR = strSPR;
                 ewOrder.DocumentNum = orderInfo.mnEdiDocumentNumber; // Add the returned document number from JDE to the order
                 ewOrder.SalesOrder = orderInfo.mnDocumentOrderInvoiceE; // Add the returned invoice number from JDE to the order
-                
+
             }
 
 
@@ -182,14 +182,14 @@ public class ConceptService : IConceptService
                         key = Convert.ToInt32(keyvalue);
                         foreach (var item in ewOrder.DoorItems)
                         {
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_1, item.CNC_SB_RP1, item.PC_SB_RP1, item.SB_RP_1_PANEL_TYPE, item.SB_RP_1_ORPHAN, ewOrder.OrderType,item.SB_RP1_PANEL_CONFIGURATION, item.SB_RP_1_DOOR_MODEL, item.SB_RP_1_PANEL_STYLE, item.SB_RP_1_DOOR_COLOUR, item.SB_RP_1_DRILL_FOR_HINGES, item.SB_RP_1_DRILL_CODE, item.SB_RP_1_GLAZED, item.SB_RP_1_BOTTOM_RTNR_SEAL, item.SB_RP_1_END_CAP, item.SB_RP_1_PANEL_SEQUENCE, item.SB_RP_1_SMART_COM_CODE, item.SB_RP_1_DF_SEQ, item.SB_RP_1_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_2, item.CNC_SB_RP2, item.PC_SB_RP2, item.SB_RP_2_PANEL_TYPE, item.SB_RP_2_ORPHAN, ewOrder.OrderType,item.SB_RP2_PANEL_CONFIGURATION, item.SB_RP_2_DOOR_MODEL, item.SB_RP_2_PANEL_STYLE, item.SB_RP_2_DOOR_COLOUR, item.SB_RP_2_DRILL_FOR_HINGES, item.SB_RP_2_DRILL_CODE, item.SB_RP_2_GLAZED, item.SB_RP_2_BOTTOM_RTNR_SEAL, item.SB_RP_2_END_CAP, item.SB_RP_2_PANEL_SEQUENCE, item.SB_RP_2_SMART_COM_CODE, item.SB_RP_2_DF_SEQ, item.SB_RP_2_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_1, item.CNC_INT1_RP1, item.PC_INT1_RP1, item.INT1_RP1_PANEL_TYPE, item.INT1_RP_1_ORPHAN, ewOrder.OrderType,item.INT1_RP1_PANEL_CONFIGURATION,item.INT1_RP_1_DOOR_MODEL,item.INT1_RP_1_PANEL_STYLE,item.INT1_RP_1_DOOR_COLOUR,item.INT1_RP_1_DRILL_FOR_HINGES,item.INT1_RP_1_DRILL_CODE,item.INT1_RP_1_GLAZED,item.INT1_RP_1_BOTTOM_RTNR_SEAL,item.INT1_RP_1_END_CAP,item.INT1_RP_1_PANEL_SEQUENCE,item.INT1_RP_1_SMART_COM_CODE,item.INT1_RP_1_DF_SEQ,item.INT1_RP_1_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_2, item.CNC_INT1_RP2, item.PC_INT1_RP2, item.INT1_RP2_PANEL_TYPE, item.INT1_RP_2_ORPHAN, ewOrder.OrderType,item.INT1_RP2_PANEL_CONFIGURATION,item.INT1_RP_2_DOOR_MODEL,item.INT1_RP_2_PANEL_STYLE,item.INT1_RP_2_DOOR_COLOUR,item.INT1_RP_2_DRILL_FOR_HINGES,item.INT1_RP_2_DRILL_CODE,item.INT1_RP_2_GLAZED,item.INT1_RP_2_BOTTOM_RTNR_SEAL,item.INT1_RP_2_END_CAP,item.INT1_RP_2_PANEL_SEQUENCE,item.INT1_RP_2_SMART_COM_CODE,item.INT1_RP_2_DF_SEQ,item.INT1_RP_2_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_1, item.CNC_INT2_RP1, item.PC_INT2_RP1, item.INT2_RP1_PANEL_TYPE, item.INT2_RP_1_ORPHAN, ewOrder.OrderType,item.INT2_RP1_PANEL_CONFIGURATION,item.INT2_RP_1_DOOR_MODEL,item.INT2_RP_1_PANEL_STYLE,item.INT2_RP_1_DOOR_COLOUR,item.INT2_RP_1_DRILL_FOR_HINGES,item.INT2_RP_1_DRILL_CODE,item.INT2_RP_1_GLAZED,item.INT2_RP_1_BOTTOM_RTNR_SEAL,item.INT2_RP_1_END_CAP,item.INT2_RP_1_PANEL_SEQUENCE,item.INT2_RP_1_SMART_COM_CODE,item.INT2_RP_1_DF_SEQ,item.INT2_RP_1_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_2, item.CNC_INT2_RP2, item.PC_INT2_RP2, item.INT2_RP2_PANEL_TYPE, item.INT2_RP_2_ORPHAN, ewOrder.OrderType,item.INT2_RP2_PANEL_CONFIGURATION,item.INT2_RP_2_DOOR_MODEL,item.INT2_RP_2_PANEL_STYLE,item.INT2_RP_2_DOOR_COLOUR,item.INT2_RP_2_DRILL_FOR_HINGES,item.INT2_RP_2_DRILL_CODE,item.INT2_RP_2_GLAZED,item.INT2_RP_2_BOTTOM_RTNR_SEAL,item.INT2_RP_2_END_CAP,item.INT2_RP_2_PANEL_SEQUENCE,item.INT2_RP_2_SMART_COM_CODE,item.INT2_RP_2_DF_SEQ,item.INT2_RP_2_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_1, item.CNC_INT3_RP1, item.PC_INT3_RP1, item.INT3_RP1_PANEL_TYPE, item.INT3_RP_1_ORPHAN, ewOrder.OrderType,item.INT3_RP1_PANEL_CONFIGURATION,item.INT3_RP_1_DOOR_MODEL,item.INT3_RP_1_PANEL_STYLE,item.INT3_RP_1_DOOR_COLOUR,item.INT3_RP_1_DRILL_FOR_HINGES,item.INT3_RP_1_DRILL_CODE,item.INT3_RP_1_GLAZED,item.INT3_RP_1_BOTTOM_RTNR_SEAL,item.INT3_RP_1_END_CAP,item.INT3_RP_1_PANEL_SEQUENCE,item.INT3_RP_1_SMART_COM_CODE,item.INT3_RP_1_DF_SEQ,item.INT3_RP_1_WIDTH_CODE);
-                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_2, item.CNC_INT3_RP2, item.PC_INT3_RP2, item.INT3_RP2_PANEL_TYPE, item.INT3_RP_2_ORPHAN, ewOrder.OrderType,item.INT3_RP2_PANEL_CONFIGURATION,item.INT3_RP_2_DOOR_MODEL,item.INT3_RP_2_PANEL_STYLE,item.INT3_RP_2_DOOR_COLOUR,item.INT3_RP_2_DRILL_FOR_HINGES,item.INT3_RP_2_DRILL_CODE,item.INT3_RP_2_GLAZED,item.INT3_RP_2_BOTTOM_RTNR_SEAL,item.INT3_RP_2_END_CAP,item.INT3_RP_2_PANEL_SEQUENCE,item.INT3_RP_2_SMART_COM_CODE,item.INT3_RP_2_DF_SEQ,item.INT3_RP_2_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_1, item.CNC_SB_RP1, item.PC_SB_RP1, item.SB_RP_1_PANEL_TYPE, item.SB_RP_1_ORPHAN, ewOrder.OrderType, item.SB_RP1_PANEL_CONFIGURATION, item.SB_RP_1_DOOR_MODEL, item.SB_RP_1_PANEL_STYLE, item.SB_RP_1_DOOR_COLOUR, item.SB_RP_1_DRILL_FOR_HINGES, item.SB_RP_1_DRILL_CODE, item.SB_RP_1_GLAZED, item.SB_RP_1_BOTTOM_RTNR_SEAL, item.SB_RP_1_END_CAP, item.SB_RP_1_PANEL_SEQUENCE, item.SB_RP_1_SMART_COM_CODE, item.SB_RP_1_DF_SEQ, item.SB_RP_1_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_2, item.CNC_SB_RP2, item.PC_SB_RP2, item.SB_RP_2_PANEL_TYPE, item.SB_RP_2_ORPHAN, ewOrder.OrderType, item.SB_RP2_PANEL_CONFIGURATION, item.SB_RP_2_DOOR_MODEL, item.SB_RP_2_PANEL_STYLE, item.SB_RP_2_DOOR_COLOUR, item.SB_RP_2_DRILL_FOR_HINGES, item.SB_RP_2_DRILL_CODE, item.SB_RP_2_GLAZED, item.SB_RP_2_BOTTOM_RTNR_SEAL, item.SB_RP_2_END_CAP, item.SB_RP_2_PANEL_SEQUENCE, item.SB_RP_2_SMART_COM_CODE, item.SB_RP_2_DF_SEQ, item.SB_RP_2_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_1, item.CNC_INT1_RP1, item.PC_INT1_RP1, item.INT1_RP1_PANEL_TYPE, item.INT1_RP_1_ORPHAN, ewOrder.OrderType, item.INT1_RP1_PANEL_CONFIGURATION, item.INT1_RP_1_DOOR_MODEL, item.INT1_RP_1_PANEL_STYLE, item.INT1_RP_1_DOOR_COLOUR, item.INT1_RP_1_DRILL_FOR_HINGES, item.INT1_RP_1_DRILL_CODE, item.INT1_RP_1_GLAZED, item.INT1_RP_1_BOTTOM_RTNR_SEAL, item.INT1_RP_1_END_CAP, item.INT1_RP_1_PANEL_SEQUENCE, item.INT1_RP_1_SMART_COM_CODE, item.INT1_RP_1_DF_SEQ, item.INT1_RP_1_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_2, item.CNC_INT1_RP2, item.PC_INT1_RP2, item.INT1_RP2_PANEL_TYPE, item.INT1_RP_2_ORPHAN, ewOrder.OrderType, item.INT1_RP2_PANEL_CONFIGURATION, item.INT1_RP_2_DOOR_MODEL, item.INT1_RP_2_PANEL_STYLE, item.INT1_RP_2_DOOR_COLOUR, item.INT1_RP_2_DRILL_FOR_HINGES, item.INT1_RP_2_DRILL_CODE, item.INT1_RP_2_GLAZED, item.INT1_RP_2_BOTTOM_RTNR_SEAL, item.INT1_RP_2_END_CAP, item.INT1_RP_2_PANEL_SEQUENCE, item.INT1_RP_2_SMART_COM_CODE, item.INT1_RP_2_DF_SEQ, item.INT1_RP_2_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_1, item.CNC_INT2_RP1, item.PC_INT2_RP1, item.INT2_RP1_PANEL_TYPE, item.INT2_RP_1_ORPHAN, ewOrder.OrderType, item.INT2_RP1_PANEL_CONFIGURATION, item.INT2_RP_1_DOOR_MODEL, item.INT2_RP_1_PANEL_STYLE, item.INT2_RP_1_DOOR_COLOUR, item.INT2_RP_1_DRILL_FOR_HINGES, item.INT2_RP_1_DRILL_CODE, item.INT2_RP_1_GLAZED, item.INT2_RP_1_BOTTOM_RTNR_SEAL, item.INT2_RP_1_END_CAP, item.INT2_RP_1_PANEL_SEQUENCE, item.INT2_RP_1_SMART_COM_CODE, item.INT2_RP_1_DF_SEQ, item.INT2_RP_1_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_2, item.CNC_INT2_RP2, item.PC_INT2_RP2, item.INT2_RP2_PANEL_TYPE, item.INT2_RP_2_ORPHAN, ewOrder.OrderType, item.INT2_RP2_PANEL_CONFIGURATION, item.INT2_RP_2_DOOR_MODEL, item.INT2_RP_2_PANEL_STYLE, item.INT2_RP_2_DOOR_COLOUR, item.INT2_RP_2_DRILL_FOR_HINGES, item.INT2_RP_2_DRILL_CODE, item.INT2_RP_2_GLAZED, item.INT2_RP_2_BOTTOM_RTNR_SEAL, item.INT2_RP_2_END_CAP, item.INT2_RP_2_PANEL_SEQUENCE, item.INT2_RP_2_SMART_COM_CODE, item.INT2_RP_2_DF_SEQ, item.INT2_RP_2_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_1, item.CNC_INT3_RP1, item.PC_INT3_RP1, item.INT3_RP1_PANEL_TYPE, item.INT3_RP_1_ORPHAN, ewOrder.OrderType, item.INT3_RP1_PANEL_CONFIGURATION, item.INT3_RP_1_DOOR_MODEL, item.INT3_RP_1_PANEL_STYLE, item.INT3_RP_1_DOOR_COLOUR, item.INT3_RP_1_DRILL_FOR_HINGES, item.INT3_RP_1_DRILL_CODE, item.INT3_RP_1_GLAZED, item.INT3_RP_1_BOTTOM_RTNR_SEAL, item.INT3_RP_1_END_CAP, item.INT3_RP_1_PANEL_SEQUENCE, item.INT3_RP_1_SMART_COM_CODE, item.INT3_RP_1_DF_SEQ, item.INT3_RP_1_WIDTH_CODE);
+                            SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_2, item.CNC_INT3_RP2, item.PC_INT3_RP2, item.INT3_RP2_PANEL_TYPE, item.INT3_RP_2_ORPHAN, ewOrder.OrderType, item.INT3_RP2_PANEL_CONFIGURATION, item.INT3_RP_2_DOOR_MODEL, item.INT3_RP_2_PANEL_STYLE, item.INT3_RP_2_DOOR_COLOUR, item.INT3_RP_2_DRILL_FOR_HINGES, item.INT3_RP_2_DRILL_CODE, item.INT3_RP_2_GLAZED, item.INT3_RP_2_BOTTOM_RTNR_SEAL, item.INT3_RP_2_END_CAP, item.INT3_RP_2_PANEL_SEQUENCE, item.INT3_RP_2_SMART_COM_CODE, item.INT3_RP_2_DF_SEQ, item.INT3_RP_2_WIDTH_CODE);
                         }
                     }
                     else
@@ -197,31 +197,31 @@ public class ConceptService : IConceptService
                         WriteLog("Could not get key value from the custom table");
                     }
                 }
-                 if (ewOrder.OrderType == "C")                
-                 {
-                        if (!string.IsNullOrWhiteSpace(keyvalue))
+                if (ewOrder.OrderType == "C")
+                {
+                    if (!string.IsNullOrWhiteSpace(keyvalue))
+                    {
+                        key = Convert.ToInt32(keyvalue);
+                        foreach (var item in ewOrder.DoorItems)
                         {
-                            key = Convert.ToInt32(keyvalue);
-                            foreach (var item in ewOrder.DoorItems)
-                            {
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_1_SEC_BDL_RP, item.SEC_1, item.SEC_1_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_1, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_2_SEC_BDL_RP, item.SEC_2, item.SEC_2_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_2, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_3_SEC_BDL_RP, item.SEC_3, item.SEC_3_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_3, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_4_SEC_BDL_RP, item.SEC_4, item.SEC_4_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_4, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_5_SEC_BDL_RP, item.SEC_5, item.SEC_5_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_5, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_6_SEC_BDL_RP, item.SEC_6, item.SEC_6_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_6, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_7_SEC_BDL_RP, item.SEC_7, item.SEC_7_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_7, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_8_SEC_BDL_RP, item.SEC_8, item.SEC_8_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_8, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_9_SEC_BDL_RP, item.SEC_9, item.SEC_9_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_9, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_10_SEC_BDL_RP,item.SEC_10,item.SEC_10_PANEL_QTY,item.PANEL_CONFIGURATION_SEC_10,ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_BTM_SEC_BDL_RP,item.SEC_BTM,item.SEC_BTM_PANEL_QTY,item.PANEL_CONFIGURATION_SEC_BTM,ewOrder.OrderType);
-                            }
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_1_SEC_BDL_RP, item.SEC_1, item.SEC_1_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_1, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_2_SEC_BDL_RP, item.SEC_2, item.SEC_2_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_2, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_3_SEC_BDL_RP, item.SEC_3, item.SEC_3_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_3, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_4_SEC_BDL_RP, item.SEC_4, item.SEC_4_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_4, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_5_SEC_BDL_RP, item.SEC_5, item.SEC_5_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_5, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_6_SEC_BDL_RP, item.SEC_6, item.SEC_6_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_6, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_7_SEC_BDL_RP, item.SEC_7, item.SEC_7_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_7, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_8_SEC_BDL_RP, item.SEC_8, item.SEC_8_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_8, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_9_SEC_BDL_RP, item.SEC_9, item.SEC_9_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_9, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_10_SEC_BDL_RP, item.SEC_10, item.SEC_10_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_10, ewOrder.OrderType);
+                            SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_BTM_SEC_BDL_RP, item.SEC_BTM, item.SEC_BTM_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_BTM, ewOrder.OrderType);
                         }
-                        else
-                        {
-                            WriteLog("Could not get key value from the custom table");
-                        }
-                  }                               
+                    }
+                    else
+                    {
+                        WriteLog("Could not get key value from the custom table");
+                    }
+                }
             }
             else
             {
@@ -252,10 +252,10 @@ public class ConceptService : IConceptService
         WriteLog("Completed processing of EW Sales Order " + ewOrder.SalesOrder);
         return new FireOrderReturn() { success = processed.ToString(), key = "", message = "" };
     }
-    
+
 
     //revised with CNC Code
-    private void SetGlazingData(int key, string salesorder, string data, string data1, string data2, string data3, string data4, string data5, string data6, string data7,string data8, string data9,string data10,string data11,string data12,string data13,string data14,string data15,string data16,string data17,string data18)
+    private void SetGlazingData(int key, string salesorder, string data, string data1, string data2, string data3, string data4, string data5, string data6, string data7, string data8, string data9, string data10, string data11, string data12, string data13, string data14, string data15, string data16, string data17, string data18)
     {
         if (!string.IsNullOrWhiteSpace(data))
         {
@@ -268,19 +268,19 @@ public class ConceptService : IConceptService
             var values = data.Split(',');
             //var CNCvalues = data1.Split(',');
             var CNCvalues1toend = "";
-             if (!string.IsNullOrEmpty(data1))
-             {
-                 var CNCvalues = data1.Split(',');
-                 // Ensure there's at least one value in CNCvalues before looping
-                 if (CNCvalues.Length > 1)
-                 {
-                     for (int j = 1; j < CNCvalues.Length; j++)
-                     {
-                         CNCvalues1toend += CNCvalues1toend != "" ? "," : "";
-                         CNCvalues1toend += CNCvalues[j];
-                     }
-                 }
-             }
+            if (!string.IsNullOrEmpty(data1))
+            {
+                var CNCvalues = data1.Split(',');
+                // Ensure there's at least one value in CNCvalues before looping
+                if (CNCvalues.Length > 1)
+                {
+                    for (int j = 1; j < CNCvalues.Length; j++)
+                    {
+                        CNCvalues1toend += CNCvalues1toend != "" ? "," : "";
+                        CNCvalues1toend += CNCvalues[j];
+                    }
+                }
+            }
             var Panelcode = "";
             var PanelType = "";
             var values3toend = "";
@@ -301,7 +301,7 @@ public class ConceptService : IConceptService
             var DFSeq = data17;
             var WidthCode = data18;
 
-             
+
             if (string.IsNullOrEmpty(data1))
             {
                 Panelcode = "";
@@ -312,7 +312,7 @@ public class ConceptService : IConceptService
             }
 
             PanelType = data3;
-            if(string.IsNullOrEmpty(data4))
+            if (string.IsNullOrEmpty(data4))
             {
                 Orphan = "";
             }
@@ -320,7 +320,7 @@ public class ConceptService : IConceptService
             {
                 Orphan = data4;
             }
-            
+
             for (int i = 3; i < values.Length; i++)
             {
                 values3toend += values3toend != "" ? "," : "";
@@ -333,7 +333,7 @@ public class ConceptService : IConceptService
                 CNCvalues1toend += CNCvalues[j];
             }*/
 
-            var args = new string[] { key.ToString(), values[0], values[1], values[2], values3toend, CNCvalues1toend,Panelcode,PanelType,Orphan,OrderType,PanelGlazing,DoorModel,PanelStyle,DoorColour,DrillForHinges,DrillCode,Glazed,BottomSealRtnr,EndCap,PanelSequence,SmartComeCode,WidthCode};
+            var args = new string[] { key.ToString(), values[0], values[1], values[2], values3toend, CNCvalues1toend, Panelcode, PanelType, Orphan, OrderType, PanelGlazing, DoorModel, PanelStyle, DoorColour, DrillForHinges, DrillCode, Glazed, BottomSealRtnr, EndCap, PanelSequence, SmartComeCode, WidthCode };
             var sql = string.Format(sqlbase, args);
             _jde.ExecuteCommand(sql);
             WriteLog(sql);
@@ -360,7 +360,7 @@ public class ConceptService : IConceptService
             var OrderType = data4;
             var PanelGlazing = data3;
 
-            var args = new string[] { key.ToString(), values[0], values[1], CNCvalues, OrderType,PanelQty,PanelGlazing };
+            var args = new string[] { key.ToString(), values[0], values[1], CNCvalues, OrderType, PanelQty, PanelGlazing };
             var sql = string.Format(sqlbase, args);
             _jde.ExecuteCommand(sql);
             if (_jde.Error != "")
@@ -515,8 +515,8 @@ public class ConceptService : IConceptService
                     GLBottomSeal = "",
                     GLTrussStyle = "",
                     GLGlazingType = "",
-                    GlALumGlazingType="",
-                    GL_ALUM_BTM_SEC_TYPE="",               
+                    GlALumGlazingType = "",
+                    GL_ALUM_BTM_SEC_TYPE = "",
                     GLWindowType = "",
                     GLGlassType = "",
                     GLFrameColour = "",
@@ -578,7 +578,7 @@ public class ConceptService : IConceptService
                     }
                 }
 
-                
+
 
                 // If the main part number is also in the bom add bom item descriptions
                 if (detail.SMARTPART_NUM == detail.Bom.SMARTPART_NUM)
@@ -639,472 +639,472 @@ public class ConceptService : IConceptService
 
                     // Get routing configuration data from EasyWeb
                     configuration = new Configuration() { Routing = null };
-                  //  if (detail.Routing != null)  //Removed the Routing Not equal to Null, as it was not generating media objects for Raynor Items. e.g. Alumatite generic sections
-                 //   {
-                        // For residential orders call Easyweb to get routing configuration
-                        if (ewOrder.OrderType == "R")
+                    //  if (detail.Routing != null)  //Removed the Routing Not equal to Null, as it was not generating media objects for Raynor Items. e.g. Alumatite generic sections
+                    //   {
+                    // For residential orders call Easyweb to get routing configuration
+                    if (ewOrder.OrderType == "R")
+                    {
+                        if (detail.SMARTPART_NUM.StartsWith("C-"))
                         {
-                            if (detail.SMARTPART_NUM.StartsWith("C-"))
-                            {
-                                configuration = await conceptAccess.getConfigurationAsync(detail.ID);
-                            }
+                            configuration = await conceptAccess.getConfigurationAsync(detail.ID);
                         }
-                        else
+                    }
+                    else
+                    {
+                        // For commercial orders get the routing configuration from Easyweb inputs and the database
+                        configuration = new Configuration() { Routing = detail.Routing, Input = new Input[] { } };
+                        inputnum = _database.GetTable("select INPUT_NAME, DESIGN_INPUT_VAL, PRODUCT_ID from CO_DES_INPUT where DESIGN_ID='" + detail.ID + "' and INPUT_NAME like '%_%'", "Inputs");
+                        if (inputnum > 0)
                         {
-                            // For commercial orders get the routing configuration from Easyweb inputs and the database
-                            configuration = new Configuration() { Routing = detail.Routing, Input = new Input[] { } };
-                            inputnum = _database.GetTable("select INPUT_NAME, DESIGN_INPUT_VAL, PRODUCT_ID from CO_DES_INPUT where DESIGN_ID='" + detail.ID + "' and INPUT_NAME like '%_%'", "Inputs");
-                            if (inputnum > 0)
+                            for (int i = 0; i < inputnum; i++)
                             {
-                                for (int i = 0; i < inputnum; i++)
+                                inputitem = _database.DSet.Tables["Inputs"].Rows[i][0].ToString().ToUpper();
+                                inputvalue = _database.DSet.Tables["Inputs"].Rows[i][1].ToString();
+                                if (inputitem == "SPR" && inputvalue != "N" && string.IsNullOrWhiteSpace(doorItem.HoldOrdersCode))
                                 {
-                                    inputitem = _database.DSet.Tables["Inputs"].Rows[i][0].ToString().ToUpper();
-                                    inputvalue = _database.DSet.Tables["Inputs"].Rows[i][1].ToString();
-                                    if (inputitem == "SPR" && inputvalue != "N" && string.IsNullOrWhiteSpace(doorItem.HoldOrdersCode))
+                                    //doorItem.HoldOrdersCode = item.Value[0].name;
+                                    doorItem.HoldOrdersCode = "E1";
+                                }
+                                if (inputitem == "GL_SPR_1" && inputvalue != "0" && string.IsNullOrWhiteSpace(doorItem.HoldOrdersCode))
+                                {
+                                    if (_database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "239222331" || _database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "243841551")
                                     {
-                                        //doorItem.HoldOrdersCode = item.Value[0].name;
                                         doorItem.HoldOrdersCode = "E1";
                                     }
-                                    if (inputitem == "GL_SPR_1" && inputvalue != "0" && string.IsNullOrWhiteSpace(doorItem.HoldOrdersCode))
+                                    if (_database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "212032411" && (inputvalue == "E1" || inputvalue == "E2"))
                                     {
-                                        if (_database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "239222331" || _database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "243841551")
-                                        {
-                                            doorItem.HoldOrdersCode = "E1";
-                                        }
-                                        if (_database.DSet.Tables["Inputs"].Rows[i][2].ToString() == "212032411" && (inputvalue == "E1" || inputvalue == "E2"))
-                                        {
-                                            doorItem.HoldOrdersCode = "E1";
-                                        }
+                                        doorItem.HoldOrdersCode = "E1";
                                     }
-                                    if (inputitem == "GL_DOOR_MODEL")
-                                    {
-                                        doorItem.GLDoorModel = inputvalue;
-                                    }
-                                    if (inputitem == "GL_DOOR_SIZE")
-                                    {
-                                        doorItem.GLDoorSize = inputvalue;
-                                    }
-                                    if (inputitem == "GL_NUMBER_OF_SECTION")
-                                    {
-                                        doorItem.GLNumberOfSection = inputvalue;
-                                    }
-                                    if (inputitem == "GL_DOOR_COLOUR")
-                                    {
-                                        doorItem.GLDoorColour = inputvalue;
-                                    }
-                                    if (inputitem == "GL_STYLE")
-                                    {
-                                        doorItem.GLStyle = inputvalue;
-                                    }
-                                    if (inputitem == "GL_END_CAPS")
-                                    {
-                                        doorItem.GLEndCaps = inputvalue;
-                                    }
-                                    if (inputitem == "GL_LIFT_TYPE")
-                                    {
-                                        doorItem.GLLiftType = inputvalue;
-                                    }
-                                    if (inputitem == "Gl_HL_AMT")
-                                    {
-                                        doorItem.GLHlAmt = inputvalue;
-                                    }
-                                    if (inputitem == "GL_TOP_WEATHER_SEAL")
-                                    {
-                                        doorItem.GLTopWeatherSeal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_BOTTOM_SEAL")
-                                    {
-                                        doorItem.GLBottomSeal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_TRUSS_STYLE")
-                                    {
-                                        doorItem.GLTrussStyle = inputvalue;
-                                    }
-                                    if (inputitem == "GL_GLAZING_TYPE")
-                                    {
-                                        doorItem.GLGlazingType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_ALUM_GLAZING_NOTE ")
-                                    {
-                                        doorItem.GlALumGlazingType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_WINDOW_TYPE")
-                                    {
-                                        doorItem.GLWindowType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_GLASS_TYPE")
-                                    {
-                                        doorItem.GLGlassType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_FRAME_COLOUR")
-                                    {
-                                        doorItem.GLFrameColour = inputvalue;
-                                    }
-                                    if (inputitem == "GL_LITES_PER_SPACING")
-                                    {
-                                        doorItem.GLLitesPerSpacing = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPACING")
-                                    {
-                                        doorItem.GLSpacing = inputvalue;
-                                    }
-                                    if (inputitem == "GL_HARDWARE_SIZE")
-                                    {
-                                        doorItem.GLHardwareSize = inputvalue;
-                                    }
-                                    if (inputitem == "GL_MOUNT_TYPE")
-                                    {
-                                        doorItem.GLMountType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_JAMB")
-                                    {
-                                        doorItem.GLJamb = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SHAFT_TYPE")
-                                    {
-                                        doorItem.GLShaftType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPRING_RH")
-                                    {
-                                        doorItem.GLSpringRH = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPRING_LH")
-                                    {
-                                        doorItem.GLSpringLH = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPRING_RH_DESCRIPTION")
-                                    {
-                                        doorItem.GLSpringRhDesc = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPRING_LH_DESCRIPTION")
-                                    {
-                                        doorItem.GLSpringLhDesc = inputvalue;
-                                    }
-                                    if (inputitem == "GL_EXTENSION_SPRING")
-                                    {
-                                        doorItem.GLExtensionSpring = inputvalue;
-                                    }                                
-                                    if (inputitem == "GL_MEDIA_ATTACHMENT_SB")
-                                    {
-                                        doorItem.GLMediaAttachmentSB = inputvalue;
-                                    }
-                                    if (inputitem == "MA_SB_BTM")
-                                    {
-                                        doorItem.MA_SB_BTM = inputvalue;
-                                    }
-                                    if (inputitem == "MA_SB_GLZ")
-                                    {
-                                        doorItem.MA_SB_GLZ = inputvalue;
-                                    }
-                                    if (inputitem == "MA_SB_INT_1")
-                                    {
-                                        doorItem.MA_SB_INT_1 = inputvalue;
-                                    }
-                                    if (inputitem == "MA_SB_INT_2")
-                                    {
-                                        doorItem.MA_SB_INT_2 = inputvalue;
-                                    }
-                                    if (inputitem ==  "ORDER_TYPE")
-                                    {
-                                        ewOrder.OrderType = inputvalue;
-                                    }
-                                    if (inputitem == "SPR")
-                                    {
-                                        ewOrder.SPR = inputvalue;
-                                    }
-                                    if(inputitem == "SPR_DETAIL")
-                                    {
-                                        ewOrder.SPR_DETAIL = inputvalue;
-                                    }
-                                    if (inputitem == "TAG")
-                                    {
-                                        ewOrder.JobTag = inputvalue;
-                                    }
-                                    if(inputitem == "GL_INVERTED_CURTAIN")
-                                    {
-                                        doorItem.GLInvertedCurtain = inputvalue;
-                                    }
-                                    if(inputitem == "GL_JAMB_TYPE")
-                                    {
-                                        doorItem.GLJambType = inputvalue;
-                                    }
-                                    if(inputitem == "GL_SLATS")
-                                    {
-                                        doorItem.GLSlates = inputvalue;
-                                    }
-                                    if(inputitem == "GL_GUIDES")
-                                    {
-                                        doorItem.GlGuides = inputvalue;
-                                    }
-                                    if(inputitem == "GL_EL_WL")
-                                    {
-                                        doorItem.GLElWl = inputvalue;
-                                    }
-                                    if(inputitem == "GL_DRIVE")
-                                    {
-                                        doorItem.GLDrive = inputvalue;
-                                    }
-                                    if(inputitem == "GL_CURTAIN_RAL")
-                                    {
-                                        doorItem.GLCurtainRal = inputvalue;
-                                    }
-                                    if(inputitem == "GL_HOOD_RAL")
-                                    {
-                                        doorItem.GLHoodRal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_GUIDES_RAL")
-                                    {
-                                        doorItem.GLGuidesRal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_FASCIA_RAL")
-                                    {
-                                        doorItem.GLFasciaRal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_BOTTOM_BAR_RAL")
-                                    {
-                                        doorItem.GLBottomBarRal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_JAMB_GUIDE_WEATHERSEAL")
-                                    {
-                                        doorItem.GLJambGuideWS = inputvalue;
-                                    }
-                                    if (inputitem == "GL_HEADER_SEAL")
-                                    {
-                                        doorItem.GLHeaderSeal = inputvalue;
-                                    }
-                                    if (inputitem == "GL_LITES_TYPE")
-                                    {
-                                        doorItem.GLLitesType = inputvalue;
-                                    }
-                                    if (inputitem == "GL_LOCKS")
-                                    {
-                                        doorItem.GLLocks = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SLOPED_BOTTOM_BAR")
-                                    {
-                                        doorItem.GLSlopedBottomBar = inputvalue;
-                                    }
-                                    if (inputitem == "GL_HOOD")
-                                    {
-                                        doorItem.GLHood = inputvalue;
-                                    }
-                                    if (inputitem == "GL_MASONRY_CLIP")
-                                    {
-                                        doorItem.GLMasonryClip = inputvalue;
-                                    }
-                                    if (inputitem == "GL_MOUNTING_PLATES")
-                                    {
-                                        doorItem.GLMountingPlates = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SUPPORT_BRACKETS")
-                                    {
-                                        doorItem.GlSupportBrackets = inputvalue;
-                                    }
-                                    if (inputitem == "GL_PERFORATED_SLATS")
-                                    {
-                                        doorItem.GLPerforatedSlats = inputvalue;
-                                    }
-                                    if (inputitem == "GL_BOTTOM_BAR")
-                                    {
-                                        doorItem.GlBottomBar = inputvalue;
-                                    }
-                                    if(inputitem == "GL_HOUR_RATING")
-                                    {
+                                }
+                                if (inputitem == "GL_DOOR_MODEL")
+                                {
+                                    doorItem.GLDoorModel = inputvalue;
+                                }
+                                if (inputitem == "GL_DOOR_SIZE")
+                                {
+                                    doorItem.GLDoorSize = inputvalue;
+                                }
+                                if (inputitem == "GL_NUMBER_OF_SECTION")
+                                {
+                                    doorItem.GLNumberOfSection = inputvalue;
+                                }
+                                if (inputitem == "GL_DOOR_COLOUR")
+                                {
+                                    doorItem.GLDoorColour = inputvalue;
+                                }
+                                if (inputitem == "GL_STYLE")
+                                {
+                                    doorItem.GLStyle = inputvalue;
+                                }
+                                if (inputitem == "GL_END_CAPS")
+                                {
+                                    doorItem.GLEndCaps = inputvalue;
+                                }
+                                if (inputitem == "GL_LIFT_TYPE")
+                                {
+                                    doorItem.GLLiftType = inputvalue;
+                                }
+                                if (inputitem == "Gl_HL_AMT")
+                                {
+                                    doorItem.GLHlAmt = inputvalue;
+                                }
+                                if (inputitem == "GL_TOP_WEATHER_SEAL")
+                                {
+                                    doorItem.GLTopWeatherSeal = inputvalue;
+                                }
+                                if (inputitem == "GL_BOTTOM_SEAL")
+                                {
+                                    doorItem.GLBottomSeal = inputvalue;
+                                }
+                                if (inputitem == "GL_TRUSS_STYLE")
+                                {
+                                    doorItem.GLTrussStyle = inputvalue;
+                                }
+                                if (inputitem == "GL_GLAZING_TYPE")
+                                {
+                                    doorItem.GLGlazingType = inputvalue;
+                                }
+                                if (inputitem == "GL_ALUM_GLAZING_NOTE ")
+                                {
+                                    doorItem.GlALumGlazingType = inputvalue;
+                                }
+                                if (inputitem == "GL_WINDOW_TYPE")
+                                {
+                                    doorItem.GLWindowType = inputvalue;
+                                }
+                                if (inputitem == "GL_GLASS_TYPE")
+                                {
+                                    doorItem.GLGlassType = inputvalue;
+                                }
+                                if (inputitem == "GL_FRAME_COLOUR")
+                                {
+                                    doorItem.GLFrameColour = inputvalue;
+                                }
+                                if (inputitem == "GL_LITES_PER_SPACING")
+                                {
+                                    doorItem.GLLitesPerSpacing = inputvalue;
+                                }
+                                if (inputitem == "GL_SPACING")
+                                {
+                                    doorItem.GLSpacing = inputvalue;
+                                }
+                                if (inputitem == "GL_HARDWARE_SIZE")
+                                {
+                                    doorItem.GLHardwareSize = inputvalue;
+                                }
+                                if (inputitem == "GL_MOUNT_TYPE")
+                                {
+                                    doorItem.GLMountType = inputvalue;
+                                }
+                                if (inputitem == "GL_JAMB")
+                                {
+                                    doorItem.GLJamb = inputvalue;
+                                }
+                                if (inputitem == "GL_SHAFT_TYPE")
+                                {
+                                    doorItem.GLShaftType = inputvalue;
+                                }
+                                if (inputitem == "GL_SPRING_RH")
+                                {
+                                    doorItem.GLSpringRH = inputvalue;
+                                }
+                                if (inputitem == "GL_SPRING_LH")
+                                {
+                                    doorItem.GLSpringLH = inputvalue;
+                                }
+                                if (inputitem == "GL_SPRING_RH_DESCRIPTION")
+                                {
+                                    doorItem.GLSpringRhDesc = inputvalue;
+                                }
+                                if (inputitem == "GL_SPRING_LH_DESCRIPTION")
+                                {
+                                    doorItem.GLSpringLhDesc = inputvalue;
+                                }
+                                if (inputitem == "GL_EXTENSION_SPRING")
+                                {
+                                    doorItem.GLExtensionSpring = inputvalue;
+                                }
+                                if (inputitem == "GL_MEDIA_ATTACHMENT_SB")
+                                {
+                                    doorItem.GLMediaAttachmentSB = inputvalue;
+                                }
+                                if (inputitem == "MA_SB_BTM")
+                                {
+                                    doorItem.MA_SB_BTM = inputvalue;
+                                }
+                                if (inputitem == "MA_SB_GLZ")
+                                {
+                                    doorItem.MA_SB_GLZ = inputvalue;
+                                }
+                                if (inputitem == "MA_SB_INT_1")
+                                {
+                                    doorItem.MA_SB_INT_1 = inputvalue;
+                                }
+                                if (inputitem == "MA_SB_INT_2")
+                                {
+                                    doorItem.MA_SB_INT_2 = inputvalue;
+                                }
+                                if (inputitem == "ORDER_TYPE")
+                                {
+                                    ewOrder.OrderType = inputvalue;
+                                }
+                                if (inputitem == "SPR")
+                                {
+                                    ewOrder.SPR = inputvalue;
+                                }
+                                if (inputitem == "SPR_DETAIL")
+                                {
+                                    ewOrder.SPR_DETAIL = inputvalue;
+                                }
+                                if (inputitem == "TAG")
+                                {
+                                    ewOrder.JobTag = inputvalue;
+                                }
+                                if (inputitem == "GL_INVERTED_CURTAIN")
+                                {
+                                    doorItem.GLInvertedCurtain = inputvalue;
+                                }
+                                if (inputitem == "GL_JAMB_TYPE")
+                                {
+                                    doorItem.GLJambType = inputvalue;
+                                }
+                                if (inputitem == "GL_SLATS")
+                                {
+                                    doorItem.GLSlates = inputvalue;
+                                }
+                                if (inputitem == "GL_GUIDES")
+                                {
+                                    doorItem.GlGuides = inputvalue;
+                                }
+                                if (inputitem == "GL_EL_WL")
+                                {
+                                    doorItem.GLElWl = inputvalue;
+                                }
+                                if (inputitem == "GL_DRIVE")
+                                {
+                                    doorItem.GLDrive = inputvalue;
+                                }
+                                if (inputitem == "GL_CURTAIN_RAL")
+                                {
+                                    doorItem.GLCurtainRal = inputvalue;
+                                }
+                                if (inputitem == "GL_HOOD_RAL")
+                                {
+                                    doorItem.GLHoodRal = inputvalue;
+                                }
+                                if (inputitem == "GL_GUIDES_RAL")
+                                {
+                                    doorItem.GLGuidesRal = inputvalue;
+                                }
+                                if (inputitem == "GL_FASCIA_RAL")
+                                {
+                                    doorItem.GLFasciaRal = inputvalue;
+                                }
+                                if (inputitem == "GL_BOTTOM_BAR_RAL")
+                                {
+                                    doorItem.GLBottomBarRal = inputvalue;
+                                }
+                                if (inputitem == "GL_JAMB_GUIDE_WEATHERSEAL")
+                                {
+                                    doorItem.GLJambGuideWS = inputvalue;
+                                }
+                                if (inputitem == "GL_HEADER_SEAL")
+                                {
+                                    doorItem.GLHeaderSeal = inputvalue;
+                                }
+                                if (inputitem == "GL_LITES_TYPE")
+                                {
+                                    doorItem.GLLitesType = inputvalue;
+                                }
+                                if (inputitem == "GL_LOCKS")
+                                {
+                                    doorItem.GLLocks = inputvalue;
+                                }
+                                if (inputitem == "GL_SLOPED_BOTTOM_BAR")
+                                {
+                                    doorItem.GLSlopedBottomBar = inputvalue;
+                                }
+                                if (inputitem == "GL_HOOD")
+                                {
+                                    doorItem.GLHood = inputvalue;
+                                }
+                                if (inputitem == "GL_MASONRY_CLIP")
+                                {
+                                    doorItem.GLMasonryClip = inputvalue;
+                                }
+                                if (inputitem == "GL_MOUNTING_PLATES")
+                                {
+                                    doorItem.GLMountingPlates = inputvalue;
+                                }
+                                if (inputitem == "GL_SUPPORT_BRACKETS")
+                                {
+                                    doorItem.GlSupportBrackets = inputvalue;
+                                }
+                                if (inputitem == "GL_PERFORATED_SLATS")
+                                {
+                                    doorItem.GLPerforatedSlats = inputvalue;
+                                }
+                                if (inputitem == "GL_BOTTOM_BAR")
+                                {
+                                    doorItem.GlBottomBar = inputvalue;
+                                }
+                                if (inputitem == "GL_HOUR_RATING")
+                                {
                                     doorItem.GLHourRating = inputvalue;
-                                    }
-                                    if (inputitem == "GL_SPRING_CYCLE_LIFE ")
-                                    {
-                                        doorItem.GLSpringCycleLife = inputvalue;
-                                    }
-                                    if (inputitem == "GL_FUSIBLE_LINK")
-                                    {
-                                        doorItem.GLFusibleLink = inputvalue;
-                                    }
-                                    if(inputitem == "SEC_1_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_1_SEC_BDL_RP = inputvalue;
-                                    }                                  
-                                    if (inputitem == "SEC_2_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_2_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_3_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_3_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_4_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_4_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_5_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_5_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_6_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_6_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_7_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_7_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_8_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_8_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_9_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_9_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_10_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_10_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_BTM_SEC_BDL_RP")
-                                    {
-                                        doorItem.SEC_BTM_SEC_BDL_RP = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_1")
-                                    {
-                                        doorItem.SEC_1 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_2")
-                                    {
-                                        doorItem.SEC_2 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_3")
-                                    {
-                                        doorItem.SEC_3 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_4")
-                                    {
-                                        doorItem.SEC_4 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_5")
-                                    {
-                                        doorItem.SEC_5 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_6")
-                                    {
-                                        doorItem.SEC_6 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_7")
-                                    {
-                                        doorItem.SEC_7 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_8")
-                                    {
-                                        doorItem.SEC_8 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_9")
-                                    {
-                                        doorItem.SEC_9 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_10")
-                                    {
-                                        doorItem.SEC_10 = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_BTM")
-                                    {
-                                        doorItem.SEC_BTM = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_1_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_1_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_2_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_2_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_3_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_3_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_4_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_4_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_5_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_5_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_6_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_6_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_7_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_7_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_8_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_8_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_9_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_9_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_10_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_10_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "SEC_BTM_PANEL_QTY")
-                                    {
-                                        doorItem.SEC_BTM_PANEL_QTY = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_1")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_1 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_2")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_2 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_3")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_3 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_4")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_4 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_5")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_5 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_6")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_6 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_7")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_7 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_8")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_8 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_9")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_9 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_10")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_10 = inputvalue;
-                                    }
-                                    if (inputitem == "PANEL_CONFIGURATION_SEC_BTM")
-                                    {
-                                        doorItem.PANEL_CONFIGURATION_SEC_BTM = inputvalue;
-                                    }
-                                    if (inputitem == "GL_ALUM_BOTTOM_SECTION_TYPE ")
-                                    {
-                                        doorItem.GL_ALUM_BTM_SEC_TYPE = inputvalue;
-                                    }
+                                }
+                                if (inputitem == "GL_SPRING_CYCLE_LIFE ")
+                                {
+                                    doorItem.GLSpringCycleLife = inputvalue;
+                                }
+                                if (inputitem == "GL_FUSIBLE_LINK")
+                                {
+                                    doorItem.GLFusibleLink = inputvalue;
+                                }
+                                if (inputitem == "SEC_1_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_1_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_2_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_2_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_3_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_3_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_4_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_4_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_5_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_5_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_6_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_6_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_7_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_7_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_8_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_8_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_9_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_9_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_10_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_10_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_BTM_SEC_BDL_RP")
+                                {
+                                    doorItem.SEC_BTM_SEC_BDL_RP = inputvalue;
+                                }
+                                if (inputitem == "SEC_1")
+                                {
+                                    doorItem.SEC_1 = inputvalue;
+                                }
+                                if (inputitem == "SEC_2")
+                                {
+                                    doorItem.SEC_2 = inputvalue;
+                                }
+                                if (inputitem == "SEC_3")
+                                {
+                                    doorItem.SEC_3 = inputvalue;
+                                }
+                                if (inputitem == "SEC_4")
+                                {
+                                    doorItem.SEC_4 = inputvalue;
+                                }
+                                if (inputitem == "SEC_5")
+                                {
+                                    doorItem.SEC_5 = inputvalue;
+                                }
+                                if (inputitem == "SEC_6")
+                                {
+                                    doorItem.SEC_6 = inputvalue;
+                                }
+                                if (inputitem == "SEC_7")
+                                {
+                                    doorItem.SEC_7 = inputvalue;
+                                }
+                                if (inputitem == "SEC_8")
+                                {
+                                    doorItem.SEC_8 = inputvalue;
+                                }
+                                if (inputitem == "SEC_9")
+                                {
+                                    doorItem.SEC_9 = inputvalue;
+                                }
+                                if (inputitem == "SEC_10")
+                                {
+                                    doorItem.SEC_10 = inputvalue;
+                                }
+                                if (inputitem == "SEC_BTM")
+                                {
+                                    doorItem.SEC_BTM = inputvalue;
+                                }
+                                if (inputitem == "SEC_1_PANEL_QTY")
+                                {
+                                    doorItem.SEC_1_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_2_PANEL_QTY")
+                                {
+                                    doorItem.SEC_2_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_3_PANEL_QTY")
+                                {
+                                    doorItem.SEC_3_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_4_PANEL_QTY")
+                                {
+                                    doorItem.SEC_4_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_5_PANEL_QTY")
+                                {
+                                    doorItem.SEC_5_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_6_PANEL_QTY")
+                                {
+                                    doorItem.SEC_6_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_7_PANEL_QTY")
+                                {
+                                    doorItem.SEC_7_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_8_PANEL_QTY")
+                                {
+                                    doorItem.SEC_8_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_9_PANEL_QTY")
+                                {
+                                    doorItem.SEC_9_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_10_PANEL_QTY")
+                                {
+                                    doorItem.SEC_10_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "SEC_BTM_PANEL_QTY")
+                                {
+                                    doorItem.SEC_BTM_PANEL_QTY = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_1")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_1 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_2")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_2 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_3")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_3 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_4")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_4 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_5")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_5 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_6")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_6 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_7")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_7 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_8")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_8 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_9")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_9 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_10")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_10 = inputvalue;
+                                }
+                                if (inputitem == "PANEL_CONFIGURATION_SEC_BTM")
+                                {
+                                    doorItem.PANEL_CONFIGURATION_SEC_BTM = inputvalue;
+                                }
+                                if (inputitem == "GL_ALUM_BOTTOM_SECTION_TYPE ")
+                                {
+                                    doorItem.GL_ALUM_BTM_SEC_TYPE = inputvalue;
+                                }
 
                             }
-                            }
                         }
-                   // }
+                    }
+                    // }
                 }
 
                 // Check for exclude of glazing items in order detail
@@ -1248,7 +1248,7 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.GLJamb = item.Value[0].name;
                             }
-                        if (item.name == "GL_SHAFT_TYPE")
+                            if (item.name == "GL_SHAFT_TYPE")
                             {
                                 doorItem.GLShaftType = item.Value[0].name;
                             }
@@ -1292,35 +1292,35 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.MA_SB_INT_2 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_SB_RP_1")
+                            if (item.name == "GLZ_CODE_SB_RP_1")
                             {
                                 doorItem.GLZ_CODE_SB_RP_1 = item.Value[0].name;
-                            }                           
-                            if(item.name == "GLZ_CODE_SB_RP_2")
+                            }
+                            if (item.name == "GLZ_CODE_SB_RP_2")
                             {
                                 doorItem.GLZ_CODE_SB_RP_2 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_1_RP_1")
+                            if (item.name == "GLZ_CODE_INT_1_RP_1")
                             {
                                 doorItem.GLZ_CODE_INT_1_RP_1 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_1_RP_2")
+                            if (item.name == "GLZ_CODE_INT_1_RP_2")
                             {
                                 doorItem.GLZ_CODE_INT_1_RP_2 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_2_RP_1")
+                            if (item.name == "GLZ_CODE_INT_2_RP_1")
                             {
                                 doorItem.GLZ_CODE_INT_2_RP_1 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_2_RP_2")
+                            if (item.name == "GLZ_CODE_INT_2_RP_2")
                             {
                                 doorItem.GLZ_CODE_INT_2_RP_2 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_3_RP_1")
+                            if (item.name == "GLZ_CODE_INT_3_RP_1")
                             {
-                                doorItem.GLZ_CODE_INT_3_RP_1 = item.Value[0].name; 
+                                doorItem.GLZ_CODE_INT_3_RP_1 = item.Value[0].name;
                             }
-                            if(item.name == "GLZ_CODE_INT_3_RP_2")
+                            if (item.name == "GLZ_CODE_INT_3_RP_2")
                             {
                                 doorItem.GLZ_CODE_INT_3_RP_2 = item.Value[0].name;
                             }
@@ -1332,7 +1332,7 @@ public class ConceptService : IConceptService
                             {
                                 ewOrder.SPR = item.Value[0].name;
                             }
-                            if(item.name == "SPR_DETAIL")
+                            if (item.name == "SPR_DETAIL")
                             {
                                 ewOrder.SPR_DETAIL = item.Value[0].name;
                             }
@@ -1340,7 +1340,7 @@ public class ConceptService : IConceptService
                             {
                                 ewOrder.JobTag = item.Value[0].name;
                             }
-                            if(item.name == "CNC_SB_RP1")
+                            if (item.name == "CNC_SB_RP1")
                             {
                                 doorItem.CNC_SB_RP1 = item.Value[0].name;
                             }
@@ -1348,7 +1348,7 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.CNC_SB_RP2 = item.Value[0].name;
                             }
-                            
+
                             if (item.name == "CNC_INT1_RP1")
                             {
                                 doorItem.CNC_INT1_RP1 = item.Value[0].name;
@@ -1413,11 +1413,11 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.SB_RP_1_PANEL_TYPE = item.Value[0].name;
                             }
-                            if(item.name == "SB_RP2_PANEL_TYPE")
+                            if (item.name == "SB_RP2_PANEL_TYPE")
                             {
                                 doorItem.SB_RP_2_PANEL_TYPE = item.Value[0].name;
                             }
-                            if(item.name == "INT1_RP1_PANEL_TYPE")
+                            if (item.name == "INT1_RP1_PANEL_TYPE")
                             {
                                 doorItem.INT1_RP1_PANEL_TYPE = item.Value[0].name;
                             }
@@ -1445,7 +1445,7 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.INT3_RP2_PANEL_TYPE = item.Value[0].name;
                             }
-                            if(item.name == "SB_RP_1_ORPHAN")
+                            if (item.name == "SB_RP_1_ORPHAN")
                             {
                                 doorItem.SB_RP_1_ORPHAN = item.Value[0].name;
                             }
@@ -1513,7 +1513,7 @@ public class ConceptService : IConceptService
                             {
                                 doorItem.GL_ALUM_BTM_SEC_TYPE = item.Value[0].name;
                             }
-                            if(item.name == "SB_RP_1_DOOR_MODEL")
+                            if (item.name == "SB_RP_1_DOOR_MODEL")
                             {
                                 doorItem.SB_RP_1_DOOR_MODEL = item.Value[0].name;
                             }
@@ -1900,7 +1900,7 @@ public class ConceptService : IConceptService
                             if (item.name == "INT3_RP_2_WIDTH_CODE")
                             {
                                 doorItem.INT3_RP_2_WIDTH_CODE = item.Value[0].name;
-                            }                           
+                            }
 
                         }
                     }
@@ -1982,7 +1982,8 @@ public class ConceptService : IConceptService
                                     {
                                         ewOrder.Var25.Add(itemMaster.VAR_25 + "~" + linenum.ToString());
                                     }
-                                }                               
+                                }
+
                                 if (validYLineParts.Contains(itemMaster.ITEM_NUM)) // If the door item get VAR_25
                                 {
                                     orderItem1.Door = new DoorInfo()
@@ -2052,6 +2053,7 @@ public class ConceptService : IConceptService
                                             lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
                                             orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
                                             line = linenum;
+
                                             if (bom2.ITEM_NUM.Trim().ToLower() != "comment")
                                             {
                                                 orderItem1.BOMs.Add(new BOM() { ItemNum = bom2.ITEM_NUM, Quantity = bom2.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom1.ITEM_NUM, CutInstructions = new List<string>() });
@@ -2068,6 +2070,7 @@ public class ConceptService : IConceptService
                                                         easyweblinetype = adderPrefix.Any(x => bom3.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                         linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom3.ITEM_NUM + "'");
                                                         lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
+                                                        orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
                                                         line = linenum;
                                                         // Add the bom data
                                                         if (bom3.ITEM_NUM.Trim().ToLower() != "comment")
@@ -2119,8 +2122,8 @@ public class ConceptService : IConceptService
                                                                         }
                                                                     }
                                                                     doorItem.Items.Add(orderItem4);
-                                                                }                                                               
-                                                            }                                                         
+                                                                }
+                                                            }
                                                         }
                                                         doorItem.Items.Add(orderItem3);
                                                     }
@@ -2188,6 +2191,7 @@ public class ConceptService : IConceptService
                 linetype = adderPrefix.Any(x => detail.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                 orderItem3 = GetOrderItem(null, itemMaster, "", detail, ewOrder, configuration, adderPrefix, "", linetype, linetype, line, doornum, false, true, out linenum);
                 line = linenum;
+
                 doorItem.Items.Add(orderItem3);
             }
         }
@@ -2212,6 +2216,7 @@ public class ConceptService : IConceptService
         string stockingtype = itemMaster.VAR_21;
         string itemweight = "";
 
+        /*// For development get item details from the database
         if (_environment == "dev")
         {
             // Get line, stocking type and item weight from item master database and override the line type from Var_18
@@ -2222,6 +2227,7 @@ public class ConceptService : IConceptService
                 stockingtype = _db.DSet.Tables["Item"].Rows[0][1].ToString().Trim();
                 itemweight = _db.DSet.Tables["Item"].Rows[0][2].ToString().Trim();
             }
+        }*/
 
         // If item weight not in item master database use weight from easy web
         if (string.IsNullOrEmpty(itemweight))
@@ -2253,7 +2259,7 @@ public class ConceptService : IConceptService
             {
                 linenum = 0;
             }
-            
+
             taxable = bom.UNIT_PRICE == 0 ? "" : ewOrder.Country == "CA" ? "Y" : "N";
             linetype2 = "Y" + doornum.ToString();
         }
@@ -2324,7 +2330,7 @@ public class ConceptService : IConceptService
     // Process order for JDE
     private void ProcessEWOrder(ConceptAccessAPIClient conceptAccess, EWOrder ewOrder, string in0, OrderInfo orderInfo)
     {
-        
+
         // Get the JDE urls
         string apiUrl = _configuration.GetValue<string>("AppSettings:ApiUrl"); // Main url for JDE web api
         string apiUrl2 = _configuration.GetValue<string>("AppSettings:ApiUrl2"); // JDE web api url for saving text
@@ -2332,10 +2338,6 @@ public class ConceptService : IConceptService
         if (_environment == "dev")
         {
             conceptAccess.Endpoint.Address = new System.ServiceModel.EndpointAddress(_configuration.GetValue<string>("AppSettings:EasyWebEnvDev"));
-        }
-        else if(_environment == "test")
-        {
-            conceptAccess.Endpoint.Address = new System.ServiceModel.EndpointAddress(_configuration.GetValue<string>("AppSettings:EasyWebEnvTest"));
         }
         else
         {
@@ -2378,14 +2380,14 @@ public class ConceptService : IConceptService
         {
             // Order successfully submitted
             SendMail("JDE Order Submission Success", "EasyWeb Order " + in0 + " Updated JDE order " + ewOrder.SalesOrder, emailIT);
-           
-           if (ewOrder.SPR == "Y")
-            {
-                SendSPRMail("Configure One Notification for " + "EasyWeb Order" + in0  + " ( " + ewOrder.ConfigReference + " ) " + " with SO# " + ewOrder.SalesOrder, ewOrder.SPR_DETAIL,emailSpr);
-            }
-           
 
-           
+            if (ewOrder.SPR == "Y")
+            {
+                SendSPRMail("Configure One Notification for " + "EasyWeb Order" + in0 + " ( " + ewOrder.ConfigReference + " ) " + " with SO# " + ewOrder.SalesOrder, ewOrder.SPR_DETAIL, emailSpr);
+            }
+
+
+
             if (ewOrder.CreatePO)
             {
                 try
@@ -2417,7 +2419,7 @@ public class ConceptService : IConceptService
                                     lotNumber = _jde.DSet.Tables["LineDetails"].Rows[0][0].ToString().Trim();
                                     yGroup = _jde.DSet.Tables["LineDetails"].Rows[0][1].ToString().Trim();
                                 }
-                                sw.WriteLine(ewOrder.SalesOrder + "," + lotNumber + "," + yGroup + "," + ewOrder.Var25[i]) ;
+                                sw.WriteLine(ewOrder.SalesOrder + "," + lotNumber + "," + yGroup + "," + ewOrder.Var25[i]);
                                 if (ewOrder.ExcludedItem.Count > 0)
                                 {
                                     itemNums = ewOrder.ExcludedItem[0];
@@ -2467,7 +2469,7 @@ public class ConceptService : IConceptService
             string sSQL;
             string sSQLCommand = "";
             string proc = "0";
-         //   string jdeSoType = "SO";
+            //   string jdeSoType = "SO";
             string jdeSoType = strOrderStatus;
 
 
@@ -2528,7 +2530,7 @@ public class ConceptService : IConceptService
 
     private List<RoutingText> AddRoutingDetails(string itemNum, Configuration configuration)
     {
-          
+
         List<RoutingText> routingTextList = null;
 
         // Check if routing configuration data is available
@@ -2540,7 +2542,7 @@ public class ConceptService : IConceptService
                 string workCenter = "";
                 string runLabour = "";
                 string operSequence = "";
-                string sequence_num = "" ;
+                string sequence_num = "";
                 // Loop through the routing array and call endpoint with the item routing data
 
                 foreach (var config in configuration.Routing)
@@ -2549,35 +2551,35 @@ public class ConceptService : IConceptService
                     {
                         routingTextList = new List<RoutingText>();
                         routingText = new RoutingText() { ItemNum = config.SMARTPART_NUM, Operations = new List<RoutingOperation>() };
-                            foreach (var operation in config.Operation)
+                        foreach (var operation in config.Operation)
+                        {
+                            foreach (var param in operation.OperationParam)
                             {
-                                foreach (var param in operation.OperationParam)
+                                switch (param.DESCRIPTION)
                                 {
-                                    switch (param.DESCRIPTION)
-                                    {
-                                        case "Run Time":
-                                            runLabour = param.VALUE;
-                                            break;
-                                        case "WorkCenter":
-                                            workCenter = param.VALUE;
-                                            break;
-                                        case "Sequence Number":
-                                            operSequence = param.VALUE;
-                                            break;
-                                    }
-                                }
-                                if (!routingText.Operations.Any(x => x.WorkCenter == workCenter))
-                                {
-                                    if (operSequence != "0")
-                                    {
-                                        routingText.Operations.Add(new RoutingOperation() { SequenceNumber = operSequence, Description = operation.DESCRIPTION, WorkCenter = workCenter, RunLabor = runLabour });
-                                    }
-                                }
-                                if (routingText.Operations.Count > 0 && operSequence != "0")
-                                {
-                                    routingTextList.Add(routingText);
+                                    case "Run Time":
+                                        runLabour = param.VALUE;
+                                        break;
+                                    case "WorkCenter":
+                                        workCenter = param.VALUE;
+                                        break;
+                                    case "Sequence Number":
+                                        operSequence = param.VALUE;
+                                        break;
                                 }
                             }
+                            if (!routingText.Operations.Any(x => x.WorkCenter == workCenter))
+                            {
+                                if (operSequence != "0")
+                                {
+                                    routingText.Operations.Add(new RoutingOperation() { SequenceNumber = operSequence, Description = operation.DESCRIPTION, WorkCenter = workCenter, RunLabor = runLabour });
+                                }
+                            }
+                            if (routingText.Operations.Count > 0 && operSequence != "0")
+                            {
+                                routingTextList.Add(routingText);
+                            }
+                        }
                     }
                 }
 
@@ -2748,6 +2750,7 @@ public class ConceptService : IConceptService
                     switch (_environment)
                     {
                         // Set item values from database when in development mode
+                        /*case "dev":
                             if (_db.GetTable("SELECT stkCode,SalesCat1,SalesCat2,SalesCat3,salesCat4,mpfPrp1,lnType,stkgType,buyerCdJde,leadTime,stkRunCd,mpfPrp4,VendorNum FROM dbo.SysproToJdeItemMaster WHERE stkCode='" + orderItem.ItemNum + "'", "Item") > 0) // Get stockcode details from database
                             {
                                 uom = _syspro.GetField("SELECT StockUom FROM dbo.InvMaster WHERE StockCode='" + orderItem.ItemNum + "'").Trim();
@@ -2789,6 +2792,7 @@ public class ConceptService : IConceptService
                                     glClass = "5YLN";
                                 }
                             }
+                            break;*/
                         // For production mode set item values from the easyweb data
                         case "jde":
                             uom = orderItem.UOM;
@@ -3169,6 +3173,7 @@ public class ConceptService : IConceptService
                                                 }
                                                 if (!item3.ItemNum.StartsWith("Cut To Instruction") && !item3.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item3.ItemNum.StartsWith(x)))
                                                 {
+                                                    //if (orderItem3.Add == true)
                                                     {
                                                         AddBom("", orderItem3, item3.ItemNum, apiUrl);
                                                     }
@@ -3205,9 +3210,9 @@ public class ConceptService : IConceptService
                                                                     AddBom("", orderItem4, item4.ItemNum, apiUrl);
                                                                 }
                                                             }
-                                                           if(item4.BOMs != null)
+                                                            if (item4.BOMs != null)
                                                             {
-                                                                if(item4.BOMs.Count > 0)
+                                                                if (item4.BOMs.Count > 0)
                                                                 {
                                                                     // Add fifth level item to JDE
                                                                     foreach (var item5 in item4.BOMs)
@@ -3528,24 +3533,7 @@ public class ConceptService : IConceptService
 
         PriceUpdate priceUpdate = new PriceUpdate() { PriceArray = new List<PricetItem>() };
 
-        /* -//ys-wkg
-        
-        string strOrderStatus = "";
-        string strReasonCodes = "";
-        string strOrderStatusPre = "";
 
-        strOrderStatusPre = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_ORDER_STATUS1'");
-        strReasonCodes = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_REASON_CODES1'");
-
-        strOrderStatus = strOrderStatusPre == "" ? "SO" : strOrderStatusPre;
-        
-
-        if (strOrderStatus == "SO")
-        {
-            strReasonCodes = " ";
-        }
-        *///endys
-      
         // Format ship date for jde order
         if (!string.IsNullOrWhiteSpace(ewOrder.ShipDate))
         {
@@ -3564,7 +3552,7 @@ public class ConceptService : IConceptService
             foreach (var item in doorItem.Items)
             {
                 item.AddItemDetail = true;
-               
+
                 if (!item.ItemNum.StartsWith("Cut To Instruction") && !item.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item.ItemNum.StartsWith(x)))
                 {
                     // Exclude items for Milestone
@@ -3573,7 +3561,7 @@ public class ConceptService : IConceptService
                         item.AddItemDetail = false;
                     }
                     // Compute item price per unit
-                    pricePerUnit = item.Discount != 0 ? (Math.Round(item.UnitPrice,2) - Math.Round((Math.Round(item.UnitPrice,2) * (item.Discount / 100)), 2)).ToString() : item.UnitPrice.ToString();
+                    pricePerUnit = item.Discount != 0 ? (Math.Round(item.UnitPrice, 2) - Math.Round((Math.Round(item.UnitPrice, 2) * (item.Discount / 100)), 2)).ToString() : item.UnitPrice.ToString();
                     // Set category work order field when item num has the correct format
                     catWorkOrder = " ";
                     //if (((item.ItemNum.StartsWith("3G") || item.ItemNum.StartsWith("4")) && Char.IsLetter(Convert.ToChar(item.ItemNum.Substring(2, 1))) || (item.ItemNum.StartsWith("55")) || item.ItemNum.StartsWith("ZZCUTLITE")))
@@ -3980,11 +3968,11 @@ public class ConceptService : IConceptService
             foreach (OrderItem item in doorItem.Items)
             {
                 // Add media attachment for door item - checking for linetype or VAR_29 for sections or raw panel
-                if (item.LineType == "Y" || item.VAR_29 == "ZZ" )
+                if (item.LineType == "Y" || item.VAR_29 == "ZZ")
                 {
                     WriteLog("Adding item text for " + ewOrder.SalesOrder + " - " + item.LineNum);
                     inputtext = "";
-                   // mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
+                    // mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
                     mokey = new string[] { ewOrder.SalesOrder, strOrderStatus, "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
 
 
@@ -4091,7 +4079,7 @@ public class ConceptService : IConceptService
                 if (found && doorItem.GlazingNotes != null)
                 {
                     WriteLog("Adding glazing text for " + ewOrder.SalesOrder + " - " + item.LineNum);
-                   // mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
+                    // mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
                     mokey = new string[] { ewOrder.SalesOrder, strOrderStatus, "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
 
 
@@ -4136,7 +4124,7 @@ public class ConceptService : IConceptService
                         {
                             inputtext += cutInstruction + "<br/><br/>";
                         }
-                    //    mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
+                        //    mokey = new string[] { ewOrder.SalesOrder, "SO", "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
                         mokey = new string[] { ewOrder.SalesOrder, strOrderStatus, "00500", Convert.ToDecimal(item.LineNum).ToString("0.000") };
 
                         TextAttachment textAttachment = new TextAttachment()
@@ -4340,7 +4328,7 @@ public class ConceptService : IConceptService
             client.Disconnect(true);
             client.Dispose();
         }
-        
+
         if (message != null)
         {
             //SmtpClient client = new SmtpClient("smtp.office365.com", 587);

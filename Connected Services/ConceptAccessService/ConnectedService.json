@@ -6,7 +6,7 @@
   },
   "ExtendedData": {
     "inputs": [
-      "http://192.168.1.221/JdeApiDynamicConfigurator"
+      "http://easywebdev.rwdoors.com/webservices/services/ConceptAccess"
     ],
     "collectionTypes": [
       "System.Array",
