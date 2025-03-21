@@ -175,7 +175,7 @@ public class ConceptService : IConceptService
                 // Update custom table with glazing data
                 var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
                 var key = 0;
-                if (ewOrder.OrderType == "R")
+                if (ewOrder.OrderType == "R" )
                 {
                     if (!string.IsNullOrWhiteSpace(keyvalue))
                     {
@@ -197,7 +197,7 @@ public class ConceptService : IConceptService
                         WriteLog("Could not get key value from the custom table");
                     }
                 }
-                if (ewOrder.OrderType == "C")
+                if (ewOrder.OrderType == "C" )
                 {
                     if (!string.IsNullOrWhiteSpace(keyvalue))
                     {
@@ -624,10 +624,10 @@ public class ConceptService : IConceptService
                         // Will be modified when the order type is set in an input from EasyWeb. 
                         if (master.VAR_4.StartsWith("EA") || master.VAR_4.StartsWith("FT"))
                         {
-                            if (master.ITEM_NUM.StartsWith("L")) ewOrder.OrderType = "R"; //remove when order type is set in Input
-                            if (master.ITEM_NUM.StartsWith("MILE")) ewOrder.OrderType = "R"; //remove when order type is set in Input
-                            if ((master.ITEM_NUM.StartsWith("C") || (master.ITEM_NUM.StartsWith("Lo"))) && (!(master.ITEM_NUM.StartsWith("C2") || (master.ITEM_NUM.StartsWith("C3"))))) ewOrder.OrderType = "C"; //remove when order type is set in Input
-                            //ewOrder.OrderType = strOrderType;
+                            //if (master.ITEM_NUM.StartsWith("L")) ewOrder.OrderType = "R"; //remove when order type is set in Input
+                            //if (master.ITEM_NUM.StartsWith("MILE")) ewOrder.OrderType = "R"; //remove when order type is set in Input
+                            //if ((master.ITEM_NUM.StartsWith("C") || (master.ITEM_NUM.StartsWith("Lo"))) && (!(master.ITEM_NUM.StartsWith("C2") || (master.ITEM_NUM.StartsWith("C3"))))) ewOrder.OrderType = "C"; //remove when order type is set in Input
+                            ewOrder.OrderType = strOrderType;
 
                         }
                     }
@@ -2089,6 +2089,7 @@ public class ConceptService : IConceptService
                                                                     easyweblinetype = adderPrefix.Any(x => bom4.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                                     linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom4.ITEM_NUM + "'");
                                                                     lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
+                                                                    
                                                                     orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
                                                                     line = linenum;
                                                                     // Add the bom data
@@ -3613,7 +3614,8 @@ public class ConceptService : IConceptService
                             szDescriptionLine1 = item.Description,
                             szDescriptionLine2 = " ",
                             //szLineType = item.LineType,
-                            szLineType = " ", // Line tpye will be blank for the line type will get its value from the jde item master - 4/10/2022
+                            szLineType = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? "T" : " ",
+                            //szLineType = " ", // Line tpye will be blank for the line type will get its value from the jde item master - 4/10/2022
                             //mnLineNumberKitMaster = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".000" : "1",
                             //mnComponentNumber = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".0" : "1",
                             //mnRelatedKitComponent = item.RefLineNum != 0 ? item.RefLineNum.ToString() : "1",
