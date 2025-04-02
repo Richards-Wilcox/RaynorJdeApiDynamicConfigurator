@@ -22,6 +22,7 @@ using System.Drawing;
 
 public class ConceptService : IConceptService
 {
+    
     private string logfile;
     private string EWOrderNum;
     private string emailIT;
@@ -490,6 +491,8 @@ public class ConceptService : IConceptService
         string inputvalue;
         int line = 1;
         int linenum;
+        //string V = "400";
+        //int parentpartlinenum;
         int doornum = 0;
         int inputnum;
         bool lotflag = false;
@@ -1972,8 +1975,9 @@ public class ConceptService : IConceptService
                                     linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + itemMaster.ITEM_NUM + "'");
                                 }
                                 lotflag = linetype == "W" || linetype == "T" || linetype == "Y" || linetype == "7" ? true : false;
-                                orderItem1 = GetOrderItem(bom1, itemMaster, bom.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                orderItem1 = GetOrderItem(bom1, itemMaster, bom.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line,1, doornum, lotflag, true, out linenum);
                                 line = linenum;
+                                //parentpartlinenum = line;
                                 //if (itemMaster.VAR_18 == "Y" && validYLineParts.Contains(itemMaster.ITEM_NUM)) // If the door item get VAR_25
                                 if (validYLineParts.Contains(itemMaster.ITEM_NUM)) // If the door item get VAR_25
                                 {
@@ -2051,8 +2055,10 @@ public class ConceptService : IConceptService
                                                 linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom2.ITEM_NUM + "'");
                                             }
                                             lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
-                                            orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                            //parentpartlinenum = orderItem1.LineNum;
+                                            orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem1.LineNum, doornum, lotflag, true, out linenum);
                                             line = linenum;
+                                            
 
                                             if (bom2.ITEM_NUM.Trim().ToLower() != "comment")
                                             {
@@ -2070,8 +2076,9 @@ public class ConceptService : IConceptService
                                                         easyweblinetype = adderPrefix.Any(x => bom3.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                         linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom3.ITEM_NUM + "'");
                                                         lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
-                                                        orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                                        orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, true, out linenum);
                                                         line = linenum;
+                                                        //parentpartlinenum = orderItem2.LineNum;
                                                         // Add the bom data
                                                         if (bom3.ITEM_NUM.Trim().ToLower() != "comment")
                                                         {
@@ -2090,8 +2097,9 @@ public class ConceptService : IConceptService
                                                                     linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom4.ITEM_NUM + "'");
                                                                     lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
                                                                     
-                                                                    orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                                                    orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, true, out linenum);
                                                                     line = linenum;
+                                                                    //parentpartlinenum = orderItem3.LineNum;
                                                                     // Add the bom data
                                                                     if (bom4.ITEM_NUM.Trim().ToLower() != "comment")
                                                                     {
@@ -2110,8 +2118,9 @@ public class ConceptService : IConceptService
                                                                                 easyweblinetype = adderPrefix.Any(x => bom5.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                                                 linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom5.ITEM_NUM + "'");
                                                                                 lotflag = linetype == "W" || linetype == "T" || linetype == "7" ? true : false;
-                                                                                orderItem5 = GetOrderItem(bom5, itemMaster, bom4.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, doornum, lotflag, true, out linenum);
+                                                                                orderItem5 = GetOrderItem(bom5, itemMaster, bom4.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, true, out linenum);
                                                                                 line = linenum;
+                                                                                //parentpartlinenum = orderItem4.LineNum;
                                                                                 // Add the bom data
                                                                                 if (bom5.ITEM_NUM.Trim().ToLower() != "comment")
                                                                                 {
@@ -2190,7 +2199,7 @@ public class ConceptService : IConceptService
                 // Add the component
                 itemMaster = detail.ItemMaster.Where(x => x.ITEM_NUM == detail.ITEM_NUM).FirstOrDefault();
                 linetype = adderPrefix.Any(x => detail.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
-                orderItem3 = GetOrderItem(null, itemMaster, "", detail, ewOrder, configuration, adderPrefix, "", linetype, linetype, line, doornum, false, true, out linenum);
+                orderItem3 = GetOrderItem(null, itemMaster, "", detail, ewOrder, configuration, adderPrefix, "", linetype, linetype, line, 0, doornum, false, true, out linenum);
                 line = linenum;
 
                 doorItem.Items.Add(orderItem3);
@@ -2207,13 +2216,13 @@ public class ConceptService : IConceptService
     }
 
     // Add the item to the order for JDE
-    private OrderItem GetOrderItem(Bom bom, ItemMaster itemMaster, string masterItem, Detail detail, EWOrder ewOrder, Configuration configuration, string[] adderPrefix, string lotnumber, string linetype, string easyweblinetype, int line, int doornum, bool lotflag, bool lineflag, out int newline)
+    private OrderItem GetOrderItem(Bom bom, ItemMaster itemMaster, string masterItem, Detail detail, EWOrder ewOrder, Configuration configuration, string[] adderPrefix, string lotnumber, string linetype, string easyweblinetype, int line, int parentpartlinenum, int doornum, bool lotflag, bool lineflag, out int newline)
     {
         // For testing only
-        if (itemMaster.ITEM_NUM == "LARW-18050-SASN")
+        /*if (itemMaster.ITEM_NUM == "LARW-18050-SASN")
         {
             string s = "";
-        }
+        }*/
         string stockingtype = itemMaster.VAR_21;
         string itemweight = "";
 
@@ -2242,7 +2251,9 @@ public class ConceptService : IConceptService
         float quantity;
         double unitprice;
         double discount;
-        int linenum;
+        int linenum;        
+        //int parentlinenum = int.Parse("400" + parentpartlinenum.ToString());
+        //int parentpartlinenum; 
         string taxable;
         string linetype2;
         if (bom != null)
@@ -2263,6 +2274,8 @@ public class ConceptService : IConceptService
 
             taxable = bom.UNIT_PRICE == 0 ? "" : ewOrder.Country == "CA" ? "Y" : "N";
             linetype2 = "Y" + doornum.ToString();
+            parentpartlinenum = int.Parse((parentpartlinenum * 100).ToString());
+                      
         }
         else
         {
@@ -2281,6 +2294,8 @@ public class ConceptService : IConceptService
             }
             taxable = detail.UNIT_PRICE == 0 ? "" : ewOrder.Country == "CA" ? "Y" : "N";
             linetype2 = "";
+            parentpartlinenum = int.Parse((parentpartlinenum * 100).ToString());
+
         }
 
         // Add the item to the internal structure 
@@ -2294,6 +2309,7 @@ public class ConceptService : IConceptService
             UnitPrice = unitprice,
             Discount = discount,
             LineNum = linenum,
+            ParentLineNum = parentpartlinenum,
             LineType = linetype,
             StockingType = stockingtype,
             LotNumber = lotflag ? lotnumber : "",
@@ -2543,7 +2559,7 @@ public class ConceptService : IConceptService
                 string workCenter = "";
                 string runLabour = "";
                 string operSequence = "";
-                string sequence_num = "";
+                //string sequence_num = "";
                 // Loop through the routing array and call endpoint with the item routing data
 
                 foreach (var config in configuration.Routing)
@@ -2611,10 +2627,10 @@ public class ConceptService : IConceptService
             foreach (var item in doorItem.Items)
             {
                 // For testing only
-                if (item.ItemNum == "PCT2H-D108000902-SBTVL")
+                /*if (item.ItemNum == "PCT2H-D108000902-SBTVL")
                 {
                     string s = "";
-                }
+                }*/
                 if (!string.IsNullOrWhiteSpace(item.ItemNum) && item.ItemNum != "Freight" && !item.ItemNum.StartsWith("Cut To Instruction") && !item.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item.ItemNum.StartsWith(x)))
                 {
                     if (!itemQuery.ItemArray.Any(x => x.szIdentifier2ndItem == item.ItemNum))
@@ -3619,9 +3635,12 @@ public class ConceptService : IConceptService
                             //mnLineNumberKitMaster = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".000" : "1",
                             //mnComponentNumber = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".0" : "1",
                             //mnRelatedKitComponent = item.RefLineNum != 0 ? item.RefLineNum.ToString() : "1",
-                            mnLineNumberKitMaster = "0",
-                            mnComponentNumber = "0",
-                            mnRelatedKitComponent = "0",
+                            //mnLineNumberKitMaster = "0",                     
+                            mnLineNumberKitMaster = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.000") : "0",//for generic items
+                            //mnComponentNumber = "0",
+                            mnComponentNumber = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.0") : "0",//for generic items
+                            //mnRelatedKitComponent = "0",
+                            mnRelatedKitComponent = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0") : "0", //for generic items
                             mnUnitsTransactionQty = item.Quantity.ToString(),
                             //mnAmtListPricePerUnit = ewOrder.Country.ToLower() == "ca" ? item.UnitPrice.ToString() : "0",
                             mnAmtListPricePerUnit = ewOrder.Country.ToLower() == "ca" ? pricePerUnit : "0",
@@ -3704,10 +3723,10 @@ public class ConceptService : IConceptService
             foreach (var item in doorItem.Items)
             {
                 // Testing only
-                if (item.ItemNum == "PCT2H-D108000902-SBTVL")
+                /*if (item.ItemNum == "PCT2H-D108000902-SBTVL")
                 {
                     string s = "";
-                }
+                }*/
                 // Add item pricing to JDE
                 if (!string.IsNullOrWhiteSpace(item.ItemNum) && item.ItemNum != "Freight" && item.UnitPrice != 0 && item.ShortItemNum > 0 && !item.ItemNum.StartsWith("Cut To Instruction") && !item.ItemNum.EndsWith("-CUT") && !pctExclude.Any(x => item.ItemNum.StartsWith(x)) && item.AddItemDetail)
                 {
@@ -3964,7 +3983,7 @@ public class ConceptService : IConceptService
         string[] glazingPrefix = _configuration.GetValue<string>("AppSettings:GlazingPartPrefix").Split(',');
         bool found;
         int sbitemcnt = 1;
-        OrderItem masterItem;
+        //OrderItem masterItem;
         foreach (var doorItem in ewOrder.DoorItems)
         {
             foreach (OrderItem item in doorItem.Items)

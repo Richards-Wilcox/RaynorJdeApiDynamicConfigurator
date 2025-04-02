@@ -317,6 +317,7 @@ namespace RaynorJdeApi.Models
         public double UnitPrice { get; set; }
         public double Discount { get; set; }
         public int LineNum { get; set; }
+        public int ParentLineNum { get; set; }
         public string LineType { get; set; }
         public string EasyWebLineType { get; set; }
         public string StockingType { get; set; }
