@@ -13,17 +13,14 @@ using Microsoft.Extensions.Logging;
 using SoapCore;
 using RaynorJdeApi.Models;
 using System.ServiceModel;
+using System.Runtime.Versioning;
 
-namespace RaynorJdeApi
+namespace RaynorJdeApiDynamicConfigurator
 {
-    public class Startup
+    [SupportedOSPlatform("Windows")]
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)

@@ -4,24 +4,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace RaynorJdeApi.Controllers
+namespace RaynorJdeApiDynamicConfigurator.Controllers
 {
+    [SupportedOSPlatform("Windows")]
     [Route("api/[controller]")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public class OrdersController(IConfiguration configuration) : ControllerBase
     {
-        private readonly ConceptService conceptService;
-        private readonly string ordersPath;
-
-        public OrdersController(IConfiguration configuration)
-        {
-            conceptService = new ConceptService(configuration);
-            ordersPath = configuration.GetValue<string>("AppSettings:OrdersTextFilePath");
-        }
+        private readonly ConceptService conceptService = new(configuration);
+        private readonly string ordersPath = configuration.GetValue<string>("AppSettings:OrdersTextFilePath");
 
         // GET: api/<OrdersController>
         [HttpGet("{file}")]
@@ -51,9 +47,9 @@ namespace RaynorJdeApi.Controllers
         }
 
         // Write to the application log file
-        private void WriteLog(string logfile, string text)
+        private static void WriteLog(string logfile, string text)
         {
-            StreamWriter sw = new StreamWriter(logfile, true);
+            StreamWriter sw = new(logfile, true);
             if (sw != null)
             {
                 sw.WriteLine("\r\n" + DateTime.Now + " - " + text);

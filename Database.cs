@@ -1,26 +1,29 @@
 using System;
 using System.IO;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.OleDb;
+using Microsoft.Data.SqlClient;
+using System.Runtime.Versioning;
 
-namespace RaynorJdeApi
+namespace RaynorJdeApiDynamicConfigurator
 {
+    [SupportedOSPlatform("Windows")]
+
     /// <summary>
     /// Summary description for Database.
     /// </summary>
     public class Database : IDisposable
     {
-        private bool bSql = true;
+        private readonly bool bSql = true;
         private string dError = "";
-        private string jdeTableBase;
+        private readonly string jdeTableBase;
         private DataSet dDataSet = null;
         private DataRow dDataRow = null;
         private SqlConnection dSqlConnection = null;
-        private SqlDataAdapter dSqlAdapter = null;
+        private readonly SqlDataAdapter dSqlAdapter = null;
         private SqlDataReader dSqlReader = null;
         private OleDbConnection dOleDbConnection = null;
-        private OleDbDataAdapter dOleDbAdapter = null;
+        private readonly OleDbDataAdapter dOleDbAdapter = null;
         private OleDbDataReader dOleDbReader = null;
         private bool disposed = false;
 
@@ -165,7 +168,7 @@ namespace RaynorJdeApi
         public bool ExecuteCommand(string sSQLCommand)
         {
             bool bResults = false;
-            string sMessage = "";
+            string sMessage;
             dError = "";
 
             if (sSQLCommand != "")
@@ -177,9 +180,11 @@ namespace RaynorJdeApi
                         try
                         {
                             dSqlConnection.Open();
-                            SqlCommand dSqlCommand = new SqlCommand(sSQLCommand);
-                            dSqlCommand.Connection = dSqlConnection;
-                            bResults = dSqlCommand.ExecuteNonQuery() > 0 ? true : false;
+                            SqlCommand dSqlCommand = new(sSQLCommand)
+                            {
+                                Connection = dSqlConnection
+                            };
+                            bResults = dSqlCommand.ExecuteNonQuery() > 0;
                             dSqlCommand.Dispose();
                         }
                         catch (SqlException e)
@@ -202,9 +207,11 @@ namespace RaynorJdeApi
                         {
                             sSQLCommand = sSQLCommand.Replace("CRPDTA", jdeTableBase);
                             dOleDbConnection.Open();
-                            OleDbCommand dOleDbCommand = new OleDbCommand(sSQLCommand);
-                            dOleDbCommand.Connection = dOleDbConnection;
-                            bResults = dOleDbCommand.ExecuteNonQuery() > 0 ? true : false;
+                            OleDbCommand dOleDbCommand = new(sSQLCommand)
+                            {
+                                Connection = dOleDbConnection
+                            };
+                            bResults = dOleDbCommand.ExecuteNonQuery() > 0;
                             dOleDbCommand.Dispose();
                         }
                         catch (OleDbException e)
@@ -228,7 +235,7 @@ namespace RaynorJdeApi
         public string ExecuteScalar(string sSQLCommand)
         {
             string sResults = "";
-            string sMessage = "";
+            string sMessage;
             dError = "";
 
             if (sSQLCommand != "")
@@ -239,8 +246,10 @@ namespace RaynorJdeApi
                         try
                         {
                             dSqlConnection.Open();
-                            SqlCommand dSqlCommand = new SqlCommand(sSQLCommand + ";SELECT SCOPE_IDENTITY();");
-                            dSqlCommand.Connection = dSqlConnection;
+                            SqlCommand dSqlCommand = new(sSQLCommand + ";SELECT SCOPE_IDENTITY();")
+                            {
+                                Connection = dSqlConnection
+                            };
                             sResults = dSqlCommand.ExecuteScalar().ToString();
                             dSqlCommand.Dispose();
                         }
@@ -263,8 +272,10 @@ namespace RaynorJdeApi
                         {
                             sSQLCommand = sSQLCommand.Replace("CRPDTA", jdeTableBase);
                             dOleDbConnection.Open();
-                            OleDbCommand dOleDbCommand = new OleDbCommand(sSQLCommand + ";SELECT SCOPE_IDENTITY();");
-                            dOleDbCommand.Connection = dOleDbConnection;
+                            OleDbCommand dOleDbCommand = new(sSQLCommand + ";SELECT SCOPE_IDENTITY();")
+                            {
+                                Connection = dOleDbConnection
+                            };
                             sResults = dOleDbCommand.ExecuteScalar().ToString();
                             dOleDbCommand.Dispose();
                         }
@@ -289,7 +300,7 @@ namespace RaynorJdeApi
         public string GetField(string sSQLCommand)
         {
             string sResults = "";
-            string sMessage = "";
+            string sMessage;
             dError = "";
 
             if (sSQLCommand != "")
@@ -301,8 +312,10 @@ namespace RaynorJdeApi
                         try
                         {
                             dSqlConnection.Open();
-                            SqlCommand dSqlCommand = new SqlCommand(sSQLCommand);
-                            dSqlCommand.Connection = dSqlConnection;
+                            SqlCommand dSqlCommand = new(sSQLCommand)
+                            {
+                                Connection = dSqlConnection
+                            };
                             dSqlReader = null;
                             dSqlReader = dSqlCommand.ExecuteReader();
 
@@ -318,8 +331,7 @@ namespace RaynorJdeApi
                         }
                         finally
                         {
-                            if (dSqlReader != null)
-                                dSqlReader.Close();
+                            dSqlReader?.Close();
                             dSqlConnection.Close();
                         }
                     }
@@ -332,8 +344,10 @@ namespace RaynorJdeApi
                         {
                             sSQLCommand = sSQLCommand.Replace("CRPDTA", jdeTableBase);
                             dOleDbConnection.Open();
-                            OleDbCommand dOleDbCommand = new OleDbCommand(sSQLCommand);
-                            dOleDbCommand.Connection = dOleDbConnection;
+                            OleDbCommand dOleDbCommand = new(sSQLCommand)
+                            {
+                                Connection = dOleDbConnection
+                            };
                             dOleDbReader = null;
                             dOleDbReader = dOleDbCommand.ExecuteReader();
 
@@ -347,8 +361,7 @@ namespace RaynorJdeApi
                         }
                         finally
                         {
-                            if (dOleDbReader != null)
-                                dOleDbReader.Close();
+                            dOleDbReader?.Close();
                             dOleDbConnection.Close();
                         }
                     }
@@ -364,7 +377,7 @@ namespace RaynorJdeApi
         public string GetField2(string sSQLCommand, string sSQLCommand2)
         {
             string sResults = "";
-            string sMessage = "";
+            string sMessage;
             dError = "";
 
             if (sSQLCommand != "")
@@ -376,8 +389,10 @@ namespace RaynorJdeApi
                         try
                         {
                             dSqlConnection.Open();
-                            SqlCommand dSqlCommand = new SqlCommand(sSQLCommand);
-                            dSqlCommand.Connection = dSqlConnection;
+                            SqlCommand dSqlCommand = new(sSQLCommand)
+                            {
+                                Connection = dSqlConnection
+                            };
                             dSqlReader = null;
                             dSqlReader = dSqlCommand.ExecuteReader();
 
@@ -390,8 +405,10 @@ namespace RaynorJdeApi
                                     dSqlReader.Close();
                                     dSqlReader = null;
                                 }
-                                dSqlCommand = new SqlCommand(sSQLCommand2.Replace("%1%", sResults));
-                                dSqlCommand.Connection = dSqlConnection;
+                                dSqlCommand = new SqlCommand(sSQLCommand2.Replace("%1%", sResults))
+                                {
+                                    Connection = dSqlConnection
+                                };
                                 dSqlCommand.ExecuteNonQuery();
                                 dSqlCommand.Dispose();
                             }
@@ -404,8 +421,7 @@ namespace RaynorJdeApi
                         }
                         finally
                         {
-                            if (dSqlReader != null)
-                                dSqlReader.Close();
+                            dSqlReader?.Close();
                             dSqlConnection.Close();
                         }
                     }
@@ -418,8 +434,10 @@ namespace RaynorJdeApi
                         {
                             sSQLCommand = sSQLCommand.Replace("CRPDTA", jdeTableBase);
                             dOleDbConnection.Open();
-                            OleDbCommand dOleDbCommand = new OleDbCommand(sSQLCommand);
-                            dOleDbCommand.Connection = dOleDbConnection;
+                            OleDbCommand dOleDbCommand = new(sSQLCommand)
+                            {
+                                Connection = dOleDbConnection
+                            };
                             dOleDbReader = null;
                             dOleDbReader = dOleDbCommand.ExecuteReader();
 
@@ -433,8 +451,7 @@ namespace RaynorJdeApi
                         }
                         finally
                         {
-                            if (dOleDbReader != null)
-                                dOleDbReader.Close();
+                            dOleDbReader?.Close();
                             dOleDbConnection.Close();
                         }
                     }
@@ -450,7 +467,7 @@ namespace RaynorJdeApi
         public int GetTable(string sSQLCommand, string sTableName)
         {
             int iResult = 0;
-            string sMessage = "";
+            string sMessage;
             dError = "";
 
             if (dDataSet.Tables.Contains(sTableName) == true)
@@ -465,8 +482,10 @@ namespace RaynorJdeApi
                         try
                         {
                             dSqlConnection.Open();
-                            SqlCommand dSqlCommand = new SqlCommand(sSQLCommand);
-                            dSqlCommand.Connection = dSqlConnection;
+                            SqlCommand dSqlCommand = new(sSQLCommand)
+                            {
+                                Connection = dSqlConnection
+                            };
                             dSqlAdapter.SelectCommand = dSqlCommand;
 
                             dSqlAdapter.Fill(dDataSet, sTableName);
@@ -495,8 +514,10 @@ namespace RaynorJdeApi
                         {
                             sSQLCommand = sSQLCommand.Replace("CRPDTA", jdeTableBase);
                             dOleDbConnection.Open();
-                            OleDbCommand dOleDbCommand = new OleDbCommand(sSQLCommand);
-                            dOleDbCommand.Connection = dOleDbConnection;
+                            OleDbCommand dOleDbCommand = new(sSQLCommand)
+                            {
+                                Connection = dOleDbConnection
+                            };
                             dOleDbAdapter.SelectCommand = dOleDbCommand;
 
                             dOleDbAdapter.Fill(dDataSet, sTableName);
@@ -533,10 +554,12 @@ namespace RaynorJdeApi
                 try
                 {
                     dSqlConnection.Open();
-                    SqlCommand dSqlCommand = new SqlCommand(sSQLCommand);
-                    dSqlCommand.Connection = dSqlConnection;
+                    SqlCommand dSqlCommand = new(sSQLCommand)
+                    {
+                        Connection = dSqlConnection
+                    };
                     dSqlAdapter.SelectCommand = dSqlCommand;
-                    SqlCommandBuilder dSqlCommandBuilder = new SqlCommandBuilder(dSqlAdapter);
+                    SqlCommandBuilder dSqlCommandBuilder = new(dSqlAdapter);
                     dSqlAdapter.Update(dDataSet, sTableName);
                     dSqlCommand.Dispose();
                     dSqlCommandBuilder.Dispose();
