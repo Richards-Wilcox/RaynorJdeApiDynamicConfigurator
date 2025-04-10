@@ -4053,8 +4053,8 @@ namespace RaynorJdeApiDynamicConfigurator
                                                                     if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item3.ITEM_NUM + "'", "F47012Bom") > 0)
                                                                     {
                                                                         values[2] = _jde.DSet.Tables["F47012Bom"].Rows[0][0].ToString();
-                                                                        values[3] = _jde.DSet.Tables["F47012Bom"].Rows[0][1].ToString();
-                                                                        values[4] = _jde.DSet.Tables["F47012Bom"].Rows[0][2].ToString();
+                                                                        values[3] = _jde.DSet.Tables["F47012"].Rows[0][1].ToString();
+                                                                        values[4] = _jde.DSet.Tables["F47012"].Rows[0][2].ToString();
                                                                         values[6] = item2.ITEM_NUM;
                                                                         values[7] = (++line).ToString();
                                                                         values[8] = item3.ITEM_NUM;
@@ -4075,7 +4075,8 @@ namespace RaynorJdeApiDynamicConfigurator
                                                                                     if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item4.ITEM_NUM + "'", "F47012Bom1") > 0)
                                                                                     {
                                                                                         values[2] = _jde.DSet.Tables["F47012Bom1"].Rows[0][0].ToString();
-                                                                                        values[3] = _jde.DSet.Tables["F47012Bom1"].Rows[0][2].ToString();
+                                                                                        values[3] = _jde.DSet.Tables["F47012Bom"].Rows[0][1].ToString();
+                                                                                        values[4] = _jde.DSet.Tables["F47012Bom"].Rows[0][2].ToString();
                                                                                         values[6] = item3.ITEM_NUM;
                                                                                         values[7] = (++line).ToString();
                                                                                         values[8] = item4.ITEM_NUM;
@@ -4096,7 +4097,8 @@ namespace RaynorJdeApiDynamicConfigurator
                                                                                                     if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item5.ITEM_NUM + "'", "F47012Bom2") > 0)
                                                                                                     {
                                                                                                         values[2] = _jde.DSet.Tables["F47012Bom2"].Rows[0][0].ToString();
-                                                                                                        values[3] = _jde.DSet.Tables["F47012Bom2"].Rows[0][2].ToString();
+                                                                                                        values[3] = _jde.DSet.Tables["F47012Bom1"].Rows[0][1].ToString();
+                                                                                                        values[4] = _jde.DSet.Tables["F47012Bom1"].Rows[0][2].ToString();
                                                                                                         values[6] = item4.ITEM_NUM;
                                                                                                         values[7] = (++line).ToString();
                                                                                                         values[8] = item5.ITEM_NUM;
