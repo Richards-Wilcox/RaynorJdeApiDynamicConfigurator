@@ -20,6 +20,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using System.Drawing;
 using System.Runtime.Versioning;
+using System.Data.SqlTypes;
 
 namespace RaynorJdeApiDynamicConfigurator
 {
@@ -178,6 +179,8 @@ namespace RaynorJdeApiDynamicConfigurator
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     processed = true;
 
+                    // Update F573215
+                    AddPartsToF573215(ewOrder, order);
 
                     // Update custom table with glazing data
                     var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
@@ -3986,6 +3989,146 @@ namespace RaynorJdeApiDynamicConfigurator
                 }
             }
             return returnValue;
+        }
+
+        // Add requiredd parts to JDE table F573215
+        private void AddPartsToF573215(EWOrder ewOrder, Order order)
+        {
+            int line = 0;
+            string[] values = new string[16];
+            string[] pctExclude = _configuration.GetValue<string>("AppSettings:PctPartExclude").Split(',');
+            string linetype;
+            string stocktype;
+            string sql = "insert into CRPDTA.F573215 (eckcoo,ecdoco,ecdcto,ecir03,eclnid,eclotn,eckitl,eccpnb,eclitm,ecqnty,ecedsp,ecuser,ecpid,ecjobn,ecupmj,ectday) ";
+            sql += "values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}')";
+
+            values[0] = "00500";
+            values[1] = ewOrder.SalesOrder;
+            values[5] = "";
+            values[10] = "";
+            values[13] = "";
+
+            foreach (var detail in order.Detail)
+            {
+                if (detail.Bom != null)
+                {
+                    if (detail.Bom.Bom1 != null)
+                    {
+                        foreach (var item in detail.Bom.Bom1)
+                        {
+                            if (!item.ITEM_NUM.StartsWith("Cut To Instruction") && !item.ITEM_NUM.EndsWith("-CUT") && !pctExclude.Any(x => item.ITEM_NUM.StartsWith(x)))
+                            {
+                                if (item.Bom1 != null)
+                                {
+                                    foreach (var item1 in item.Bom1)
+                                    {
+                                        if (item1.Bom1 != null)
+                                        {
+                                            foreach (var item2 in item1.Bom1)
+                                            {
+                                                if (_jde.GetTable("SELECT iblnty,ibstkt FROM CRPDTA.F4102 where iblitm = '" + item2.ITEM_NUM + "'", "F4102") > 0)
+                                                {
+                                                    linetype = _jde.DSet.Tables["F4102"].Rows[0][0].ToString();
+                                                    stocktype = _jde.DSet.Tables["F4102"].Rows[0][1].ToString();
+                                                    if (linetype == "W" || linetype == "S" || linetype == "7")
+                                                    {
+                                                        if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item2.ITEM_NUM + "'", "F47012") > 0)
+                                                        {
+                                                            values[2] = _jde.DSet.Tables["F47012"].Rows[0][0].ToString();
+                                                            values[3] = _jde.DSet.Tables["F47012"].Rows[0][1].ToString();
+                                                            values[4] = _jde.DSet.Tables["F47012"].Rows[0][2].ToString();
+                                                            values[6] = item1.ITEM_NUM;
+                                                            values[7] = (++line).ToString();
+                                                            values[8] = item2.ITEM_NUM;
+                                                            values[9] = _jde.DSet.Tables["F47012"].Rows[0][3].ToString();
+                                                            values[11] = _jde.DSet.Tables["F47012"].Rows[0][4].ToString();
+                                                            values[12] = _jde.DSet.Tables["F47012"].Rows[0][5].ToString();
+                                                            values[14] = _jde.DSet.Tables["F47012"].Rows[0][6].ToString();
+                                                            values[15] = _jde.DSet.Tables["F47012"].Rows[0][7].ToString();
+                                                            _jde.ExecuteCommand(string.Format(sql, values));
+                                                            if (stocktype == "C" && item2.Bom1 != null)
+                                                            {
+                                                                foreach (var item3 in item2.Bom1)
+                                                                {
+                                                                    if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item3.ITEM_NUM + "'", "F47012Bom") > 0)
+                                                                    {
+                                                                        values[2] = _jde.DSet.Tables["F47012Bom"].Rows[0][0].ToString();
+                                                                        values[3] = _jde.DSet.Tables["F47012Bom"].Rows[0][1].ToString();
+                                                                        values[4] = _jde.DSet.Tables["F47012Bom"].Rows[0][2].ToString();
+                                                                        values[6] = item2.ITEM_NUM;
+                                                                        values[7] = (++line).ToString();
+                                                                        values[8] = item3.ITEM_NUM;
+                                                                        values[9] = _jde.DSet.Tables["F47012Bom"].Rows[0][3].ToString();
+                                                                        values[11] = _jde.DSet.Tables["F47012Bom"].Rows[0][4].ToString();
+                                                                        values[12] = _jde.DSet.Tables["F47012Bom"].Rows[0][5].ToString();
+                                                                        values[14] = _jde.DSet.Tables["F47012Bom"].Rows[0][6].ToString();
+                                                                        values[15] = _jde.DSet.Tables["F47012Bom"].Rows[0][7].ToString();
+                                                                        _jde.ExecuteCommand(string.Format(sql, values));
+                                                                        if (_jde.GetTable("SELECT iblnty,ibstkt FROM CRPDTA.F4102 where iblitm = '" + item3.ITEM_NUM + "'", "F4102") > 0)
+                                                                        {
+                                                                            linetype = _jde.DSet.Tables["F4102"].Rows[0][0].ToString();
+                                                                            stocktype = _jde.DSet.Tables["F4102"].Rows[0][1].ToString();
+                                                                            if (stocktype == "C" && item3.Bom1 != null)
+                                                                            {
+                                                                                foreach (var item4 in item3.Bom1)
+                                                                                {
+                                                                                    if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item4.ITEM_NUM + "'", "F47012Bom1") > 0)
+                                                                                    {
+                                                                                        values[2] = _jde.DSet.Tables["F47012Bom1"].Rows[0][0].ToString();
+                                                                                        values[3] = _jde.DSet.Tables["F47012Bom1"].Rows[0][2].ToString();
+                                                                                        values[6] = item3.ITEM_NUM;
+                                                                                        values[7] = (++line).ToString();
+                                                                                        values[8] = item4.ITEM_NUM;
+                                                                                        values[9] = _jde.DSet.Tables["F47012Bom1"].Rows[0][3].ToString();
+                                                                                        values[11] = _jde.DSet.Tables["F47012Bom1"].Rows[0][4].ToString();
+                                                                                        values[12] = _jde.DSet.Tables["F47012Bom1"].Rows[0][5].ToString();
+                                                                                        values[14] = _jde.DSet.Tables["F47012Bom1"].Rows[0][6].ToString();
+                                                                                        values[15] = _jde.DSet.Tables["F47012Bom1"].Rows[0][7].ToString();
+                                                                                        _jde.ExecuteCommand(string.Format(sql, values));
+                                                                                        if (_jde.GetTable("SELECT iblnty,ibstkt FROM CRPDTA.F4102 where iblitm = '" + item4.ITEM_NUM + "'", "F4102") > 0)
+                                                                                        {
+                                                                                            linetype = _jde.DSet.Tables["F4102"].Rows[0][0].ToString();
+                                                                                            stocktype = _jde.DSet.Tables["F4102"].Rows[0][1].ToString();
+                                                                                            if (stocktype == "C" && item4.Bom1 != null)
+                                                                                            {
+                                                                                                foreach (var item5 in item4.Bom1)
+                                                                                                {
+                                                                                                    if (_jde.GetTable("SELECT szdcto,szir03,szlnid,szuorg,szuser,szpid,szupmj,sztday FROM CRPDTA.F47012 where szkcoo = '00500' and szdoco = '" + ewOrder.SalesOrder + "' and szlitm = '" + item5.ITEM_NUM + "'", "F47012Bom2") > 0)
+                                                                                                    {
+                                                                                                        values[2] = _jde.DSet.Tables["F47012Bom2"].Rows[0][0].ToString();
+                                                                                                        values[3] = _jde.DSet.Tables["F47012Bom2"].Rows[0][2].ToString();
+                                                                                                        values[6] = item4.ITEM_NUM;
+                                                                                                        values[7] = (++line).ToString();
+                                                                                                        values[8] = item5.ITEM_NUM;
+                                                                                                        values[9] = _jde.DSet.Tables["F47012Bom2"].Rows[0][3].ToString();
+                                                                                                        values[11] = _jde.DSet.Tables["F47012Bom2"].Rows[0][4].ToString();
+                                                                                                        values[12] = _jde.DSet.Tables["F47012Bom2"].Rows[0][5].ToString();
+                                                                                                        values[14] = _jde.DSet.Tables["F47012Bom2"].Rows[0][6].ToString();
+                                                                                                        values[15] = _jde.DSet.Tables["F47012Bom2"].Rows[0][7].ToString();
+                                                                                                        _jde.ExecuteCommand(string.Format(sql, values));
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Process the order text
