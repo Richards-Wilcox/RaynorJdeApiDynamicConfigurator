@@ -515,4 +515,16 @@ namespace RaynorJdeApi.Models
         public object startEffectiveDate { get; set; }
         public object endEffectiveDate { get; set; }
     }
+
+    [Serializable]
+    public class PostOrder
+    {
+        public string Company { get; set; }
+        public string OrderNbr { get; set; }
+        public string DocType { get; set; }
+        public string YGroup_IR03 { get; set; }
+        public string Branch { get; set; }
+        public string InitialParentItemNbr { get; set; }
+        public string Order_Quantity { get; set; }
+    }
 }
