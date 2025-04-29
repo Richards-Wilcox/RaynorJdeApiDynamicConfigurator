@@ -174,17 +174,23 @@ namespace RaynorJdeApiDynamicConfigurator
                 ProcessEWOrder(conceptAccess, ewOrder, in0, orderInfo);
                 if (string.IsNullOrWhiteSpace(ewOrder.Error)) // Check for errors generated when processing order
                 {
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        await Task.Delay(6000);
-                        conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
-                    });
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    processed = true;
-
                     // Update F573215 and F573211
-                    AddPartsToF573215AndF573211(ewOrder, order, orderInfo, apiUrl4);
+                    result = AddPartsToF573215AndF573211(ewOrder, order, orderInfo, apiUrl4);
+
+                    if (result == "")
+                    {
+                        await Task.Run(async () =>
+                        {
+                            await Task.Delay(6000);
+                            _ = conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
+                        }).ConfigureAwait(false);
+                        processed = true;
+                    }
+                    else
+                    {
+                        // Email for RW Config API error
+                        SendMail("JDE RW Config API Error for EW Order " + EWOrderNum, result, emailIT);
+                    }
 
                     // Update custom table with glazing data
                     var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
@@ -507,6 +513,7 @@ namespace RaynorJdeApiDynamicConfigurator
             string optionacc = "";
             string lotnumber = "";
             string linetype;
+            string stocktype;
             string easyweblinetype;
             string inputitem;
             string inputvalue;
@@ -517,6 +524,8 @@ namespace RaynorJdeApiDynamicConfigurator
             int doornum = 0;
             int inputnum;
             bool lotflag = false;
+            bool lineflag = true;
+            string[] stocklinetypes;
             foreach (var detail in order.Detail)
             {
                 if (detail.TYPE == "C") // Only process EasyWeb order data for Type C
@@ -1999,7 +2008,8 @@ namespace RaynorJdeApiDynamicConfigurator
                                         linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + itemMaster.ITEM_NUM + "'");
                                     }
                                     lotflag = linetype == "W" || linetype == "T" || linetype == "Y" || linetype == "7";
-                                    orderItem1 = GetOrderItem(bom1, itemMaster, bom0.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, 1, doornum, lotflag, true, 1, out linenum);
+                                    lineflag = true;
+                                    orderItem1 = GetOrderItem(bom1, itemMaster, bom0.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, 1, doornum, lotflag, lineflag, 1, out linenum);
                                     line = linenum;
                                     //parentpartlinenum = line;
                                     //if (itemMaster.VAR_18 == "Y" && validYLineParts.Contains(itemMaster.ITEM_NUM)) // If the door item get VAR_25
@@ -2064,6 +2074,7 @@ namespace RaynorJdeApiDynamicConfigurator
                                         }
                                     }
                                     // If the main item has bom components add the items and bom data to the internal structure
+                                    // if Stockcode == C and linetype == W exclude items with no bom from all levels below.
                                     if (bom1.Bom1 != null)
                                     {
                                         if (orderItem1.ItemNum == bom1.ITEM_NUM)
@@ -2079,8 +2090,9 @@ namespace RaynorJdeApiDynamicConfigurator
                                                     linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom2.ITEM_NUM + "'");
                                                 }
                                                 lotflag = linetype == "W" || linetype == "T" || linetype == "7";
+                                                lineflag = true;
                                                 //parentpartlinenum = orderItem1.LineNum;
-                                                orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem1.LineNum, doornum, lotflag, true, 2, out linenum);
+                                                orderItem2 = GetOrderItem(bom2, itemMaster, bom1.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem1.LineNum, doornum, lotflag, lineflag, 2, out linenum);
                                                 line = linenum;
 
 
@@ -2099,12 +2111,18 @@ namespace RaynorJdeApiDynamicConfigurator
                                                             itemMaster = detail.ItemMaster.Where(x => x.ITEM_NUM == bom3.ITEM_NUM).FirstOrDefault();
                                                             easyweblinetype = adderPrefix.Any(x => bom3.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                             linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom3.ITEM_NUM + "'");
+                                                            stocktype = _jde.GetField("SELECT imstkt FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom3.ITEM_NUM + "'");
                                                             lotflag = linetype == "W" || linetype == "T" || linetype == "7";
-                                                            orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, true, 3, out linenum);
+                                                            lineflag = false;
+                                                            if (linetype == "W" && stocktype == "C")
+                                                            {
+                                                                lineflag = true;
+                                                            }
+                                                            orderItem3 = GetOrderItem(bom3, itemMaster, bom2.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, lineflag, 3, out linenum);
                                                             line = linenum;
                                                             //parentpartlinenum = orderItem2.LineNum;
                                                             // Add the bom data
-                                                            if (!bom3.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase))
+                                                            if (!bom3.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase) && lineflag == true)
                                                             {
                                                                 orderItem2.BOMs.Add(new BOM() { ItemNum = bom3.ITEM_NUM, Quantity = bom3.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom2.ITEM_NUM, CutInstructions = [] });
                                                             }
@@ -2119,13 +2137,19 @@ namespace RaynorJdeApiDynamicConfigurator
                                                                         itemMaster = detail.ItemMaster.Where(x => x.ITEM_NUM == bom4.ITEM_NUM).FirstOrDefault();
                                                                         easyweblinetype = adderPrefix.Any(x => bom4.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                                         linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom4.ITEM_NUM + "'");
+                                                                        stocktype = _jde.GetField("SELECT imstkt FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom4.ITEM_NUM + "'");
+                                                                        stocklinetypes = GetStockTypeAndLineType(bom3.ITEM_NUM);
                                                                         lotflag = linetype == "W" || linetype == "T" || linetype == "7";
-
-                                                                        orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, true, 4, out linenum);
+                                                                        lineflag = false;
+                                                                        if (linetype == "W" && stocktype == "C")
+                                                                        {
+                                                                            lineflag = true;
+                                                                        }
+                                                                        orderItem4 = GetOrderItem(bom4, itemMaster, bom3.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, lineflag, 4, out linenum);
                                                                         line = linenum;
                                                                         //parentpartlinenum = orderItem3.LineNum;
                                                                         // Add the bom data
-                                                                        if (!bom4.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase))
+                                                                        if (!bom4.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase) && lineflag == true)
                                                                         {
                                                                             // Add the bom data
                                                                             orderItem3.BOMs.Add(new BOM() { ItemNum = bom4.ITEM_NUM, Quantity = bom4.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom3.ITEM_NUM, CutInstructions = [] });
@@ -2142,11 +2166,12 @@ namespace RaynorJdeApiDynamicConfigurator
                                                                                     easyweblinetype = adderPrefix.Any(x => bom5.ITEM_NUM.StartsWith(x)) ? "PA" : itemMaster.VAR_18; // Gets the linetype from easy web if set
                                                                                     linetype = _jde.GetField("SELECT imlnty FROM CRPDTA.F4101 where imprp0 = '000500' and imlitm = '" + bom5.ITEM_NUM + "'");
                                                                                     lotflag = linetype == "W" || linetype == "T" || linetype == "7";
-                                                                                    orderItem5 = GetOrderItem(bom5, itemMaster, bom4.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, false, 5, out linenum);
+                                                                                    lineflag = false;
+                                                                                    orderItem5 = GetOrderItem(bom5, itemMaster, bom4.ITEM_NUM, detail, ewOrder, configuration, adderPrefix, lotnumber, linetype, easyweblinetype, line, orderItem2.LineNum, doornum, lotflag, lineflag, 5, out linenum);
                                                                                     line = linenum;
                                                                                     //parentpartlinenum = orderItem4.LineNum;
                                                                                     // Add the bom data
-                                                                                    if (!bom5.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase))
+                                                                                    if (!bom5.ITEM_NUM.Trim().Equals("comment", StringComparison.OrdinalIgnoreCase) && lineflag == true)
                                                                                     {
                                                                                         // Add the bom data
                                                                                         orderItem4.BOMs.Add(new BOM() { ItemNum = bom5.ITEM_NUM, Quantity = bom5.QUANTITY.ToString(), Branch = "50000", CutInstPart = bom4.ITEM_NUM, CutInstructions = [] });
@@ -4000,8 +4025,9 @@ namespace RaynorJdeApiDynamicConfigurator
         }
 
         // Add required parts to JDE table F573215 and F573211
-        private void AddPartsToF573215AndF573211(EWOrder ewOrder, Order order, OrderInfo orderInfo, string apiUrl4)
+        private string AddPartsToF573215AndF573211(EWOrder ewOrder, Order order, OrderInfo orderInfo, string apiUrl4)
         {
+            string result = "";
             int line = 0;
             string[] values1 = new string[16];
             string[] values2 = new string[15];
@@ -4103,9 +4129,14 @@ namespace RaynorJdeApiDynamicConfigurator
                         Order_Quantity = orderItem.Quantity.ToString()
                     };
                     json = JsonConvert.SerializeObject(model);
-                    var result = SendWebApiMessage(apiUrl4, json).Result;
+                    result = SendWebApiMessage(apiUrl4, json).Result;
+                    if (!result.Contains("Error"))
+                    {
+                        result = "";
+                    }
                 }
             }
+            return result;
         }
 
         // Write to tables F573215 and F573211
