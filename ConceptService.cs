@@ -4109,13 +4109,14 @@ namespace RaynorJdeApiDynamicConfigurator
                 }
             }
 
-            // Call RW_ConfigToJde web service if items have a 
+            // Call RW_ConfigToJde web service if items have a valid line type and stocking type.
             var model = new PostOrder();
             var json = "";
             var orderItem = new OrderItem();
             foreach (var doorItem in ewOrder.DoorItems)
             {
-                orderItem = doorItem.Items.Where(y => y.EasyWebLineType == "Y" && y.StockingType == "G").FirstOrDefault();
+                // Check to see why the line type and stocking type are reversed - needs to be checked with all the functions
+                orderItem = doorItem.Items.Where(y => y.EasyWebLineType == "G" && y.StockingType == "Y").FirstOrDefault();
                 if (orderItem != null)
                 {
                     model = new PostOrder()
