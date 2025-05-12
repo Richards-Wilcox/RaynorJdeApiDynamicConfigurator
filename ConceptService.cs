@@ -244,7 +244,7 @@ namespace RaynorJdeApiDynamicConfigurator
                     }
 
                     // Update JDE order header to set SYSEDSP to 2
-                    string sql = "update CRPDTA.F47011 set SYEDSP = '2' where syedoc = " + ewOrder.SalesOrder + " and syedct = 'SZ' and syekco = '00500'";
+                    string sql = "update CRPDTA.F47011 set SYEDSP = '2' where sydoco = " + ewOrder.SalesOrder + " and syedct = 'SZ' and syekco = '00500'";
                     _jde.ExecuteCommand(sql);
                 }
                 else
@@ -4115,8 +4115,7 @@ namespace RaynorJdeApiDynamicConfigurator
             var orderItem = new OrderItem();
             foreach (var doorItem in ewOrder.DoorItems)
             {
-                // Check to see why the line type and stocking type are reversed - needs to be checked with all the functions
-                orderItem = doorItem.Items.Where(y => y.EasyWebLineType == "G" && y.StockingType == "Y").FirstOrDefault();
+                orderItem = doorItem.Items.Where(y => y.EasyWebLineType == "Y" && y.StockingType == "G").FirstOrDefault();
                 if (orderItem != null)
                 {
                     model = new PostOrder()
