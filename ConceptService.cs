@@ -3678,17 +3678,17 @@ namespace RaynorJdeApiDynamicConfigurator
                                 szDescriptionLine1 = item.Description,
                                 szDescriptionLine2 = " ",
                                 //szLineType = item.LineType,
-                                szLineType = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? "T" : " ",
+                                szLineType = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP") || item.ItemNum.StartsWith("SR")) ? "T" : " ",
                                 //szLineType = " ", // Line tpye will be blank for the line type will get its value from the jde item master - 4/10/2022
                                 //mnLineNumberKitMaster = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".000" : "1",
                                 //mnComponentNumber = item.RefLineNum != 0 ? item.RefLineNum.ToString() + ".0" : "1",
                                 //mnRelatedKitComponent = item.RefLineNum != 0 ? item.RefLineNum.ToString() : "1",
                                 //mnLineNumberKitMaster = "0",                     
-                                mnLineNumberKitMaster = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.000") : "0",//for generic items
+                                mnLineNumberKitMaster = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP") || item.ItemNum.StartsWith("SR")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.000") : "0",//for generic items
                                                                                                                                                                                                   //mnComponentNumber = "0",
-                                mnComponentNumber = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.0") : "0",//for generic items
+                                mnComponentNumber = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP") || item.ItemNum.StartsWith("SR")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0.0") : "0",//for generic items
                                                                                                                                                                                             //mnRelatedKitComponent = "0",
-                                mnRelatedKitComponent = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0") : "0", //for generic items
+                                mnRelatedKitComponent = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP") || item.ItemNum.StartsWith("SR")) ? (Convert.ToDecimal(item.ParentLineNum) / 1000).ToString("0") : "0", //for generic items
                                 mnUnitsTransactionQty = item.Quantity.ToString(),
                                 //mnAmtListPricePerUnit = ewOrder.Country.ToLower() == "ca" ? item.UnitPrice.ToString() : "0",
                                 mnAmtListPricePerUnit = ewOrder.Country.Equals("ca", StringComparison.OrdinalIgnoreCase) ? pricePerUnit : "0",
@@ -3717,7 +3717,7 @@ namespace RaynorJdeApiDynamicConfigurator
                                 szModeOfTransport = "TL",
                                 mnCentury = "20",
                                 cWoOrderFreezeCode = "N",
-                                mnUserReservedAmount = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP")) ? (item.ParentLineNum + 1).ToString() : "0",//for generic items,
+                                mnUserReservedAmount = (item.ItemNum.StartsWith("SC") || item.ItemNum.StartsWith("RP") || item.ItemNum.StartsWith("SR")) ? (item.ParentLineNum + 1).ToString() : "0",//for generic items,
                                 szTransactionOriginator = "W_ORDER",
                                 szProgramId = "WEBORDER",
                                 szUserId = "WEBORDER",
