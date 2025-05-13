@@ -176,21 +176,18 @@ namespace RaynorJdeApiDynamicConfigurator
                 {
                     // Update F573215 and F573211
                     result = AddPartsToF573215AndF573211(ewOrder, order, orderInfo, apiUrl4);
-
-                    if (result == "")
-                    {
-                        await Task.Run(async () =>
-                        {
-                            await Task.Delay(6000);
-                            _ = conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
-                        }).ConfigureAwait(false);
-                        processed = true;
-                    }
-                    else
+                    if (result != "")
                     {
                         // Email for RW Config API error
                         SendMail("JDE RW Config API Error for EW Order " + EWOrderNum, result, emailIT);
                     }
+
+                    await Task.Run(async () =>
+                    {
+                        await Task.Delay(6000);
+                        _ = conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
+                    }).ConfigureAwait(false);
+                    processed = true;
 
                     // Update custom table with glazing data
                     var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
