@@ -127,19 +127,22 @@ namespace RaynorJdeApiDynamicConfigurator
 
             try
             {
-                strOrderStatusPre = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_ORDER_STATUS1'");
-                strReasonCodes = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_REASON_CODES1'");
-                strOrderType = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'Order_Type'");
-                strSPR = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'SPR'");
-
-
-
-                strOrderStatus = strOrderStatusPre == "" ? "SO" : strOrderStatusPre;
-
-
-                if (strOrderStatus == "SO")
+                if (order1.Detail != null)
                 {
-                    strReasonCodes = " ";
+                    strOrderStatusPre = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_ORDER_STATUS1'");
+                    strReasonCodes = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'GL_REASON_CODES1'");
+                    strOrderType = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'Order_Type'");
+                    strSPR = _database.GetField("select  DESIGN_INPUT_VAL from CO_DES_INPUT where DESIGN_ID='" + order1.Detail[0].ID + "' and INPUT_NAME = 'SPR'");
+
+
+
+                    strOrderStatus = strOrderStatusPre == "" ? "SO" : strOrderStatusPre;
+
+
+                    if (strOrderStatus == "SO")
+                    {
+                        strReasonCodes = " ";
+                    }
                 }
             }
             catch { }
@@ -176,73 +179,76 @@ namespace RaynorJdeApiDynamicConfigurator
                 {
                     // Update F573215 and F573211
                     result = AddPartsToF573215AndF573211(ewOrder, order, orderInfo, apiUrl4);
-                    if (result != "")
+                    if (result == "")
+                    {
+                        await Task.Run(async () =>
+                        {
+                            await Task.Delay(6000);
+                            _ = conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
+                        }).ConfigureAwait(false);
+                        processed = true;
+
+                        // Update custom table with glazing data
+                        var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
+                        var key = 0;
+                        if (ewOrder.OrderType == "R")
+                        {
+                            if (!string.IsNullOrWhiteSpace(keyvalue))
+                            {
+                                key = Convert.ToInt32(keyvalue);
+                                foreach (var item in ewOrder.DoorItems)
+                                {
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_1, item.CNC_SB_RP1, item.PC_SB_RP1, item.SB_RP_1_PANEL_TYPE, item.SB_RP_1_ORPHAN, ewOrder.OrderType, item.SB_RP1_PANEL_CONFIGURATION, item.SB_RP_1_DOOR_MODEL, item.SB_RP_1_PANEL_STYLE, item.SB_RP_1_DOOR_COLOUR, item.SB_RP_1_DRILL_FOR_HINGES, item.SB_RP_1_DRILL_CODE, item.SB_RP_1_GLAZED, item.SB_RP_1_BOTTOM_RTNR_SEAL, item.SB_RP_1_END_CAP, item.SB_RP_1_PANEL_SEQUENCE, item.SB_RP_1_SMART_COM_CODE, item.SB_RP_1_DF_SEQ, item.SB_RP_1_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_2, item.CNC_SB_RP2, item.PC_SB_RP2, item.SB_RP_2_PANEL_TYPE, item.SB_RP_2_ORPHAN, ewOrder.OrderType, item.SB_RP2_PANEL_CONFIGURATION, item.SB_RP_2_DOOR_MODEL, item.SB_RP_2_PANEL_STYLE, item.SB_RP_2_DOOR_COLOUR, item.SB_RP_2_DRILL_FOR_HINGES, item.SB_RP_2_DRILL_CODE, item.SB_RP_2_GLAZED, item.SB_RP_2_BOTTOM_RTNR_SEAL, item.SB_RP_2_END_CAP, item.SB_RP_2_PANEL_SEQUENCE, item.SB_RP_2_SMART_COM_CODE, item.SB_RP_2_DF_SEQ, item.SB_RP_2_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_1, item.CNC_INT1_RP1, item.PC_INT1_RP1, item.INT1_RP1_PANEL_TYPE, item.INT1_RP_1_ORPHAN, ewOrder.OrderType, item.INT1_RP1_PANEL_CONFIGURATION, item.INT1_RP_1_DOOR_MODEL, item.INT1_RP_1_PANEL_STYLE, item.INT1_RP_1_DOOR_COLOUR, item.INT1_RP_1_DRILL_FOR_HINGES, item.INT1_RP_1_DRILL_CODE, item.INT1_RP_1_GLAZED, item.INT1_RP_1_BOTTOM_RTNR_SEAL, item.INT1_RP_1_END_CAP, item.INT1_RP_1_PANEL_SEQUENCE, item.INT1_RP_1_SMART_COM_CODE, item.INT1_RP_1_DF_SEQ, item.INT1_RP_1_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_2, item.CNC_INT1_RP2, item.PC_INT1_RP2, item.INT1_RP2_PANEL_TYPE, item.INT1_RP_2_ORPHAN, ewOrder.OrderType, item.INT1_RP2_PANEL_CONFIGURATION, item.INT1_RP_2_DOOR_MODEL, item.INT1_RP_2_PANEL_STYLE, item.INT1_RP_2_DOOR_COLOUR, item.INT1_RP_2_DRILL_FOR_HINGES, item.INT1_RP_2_DRILL_CODE, item.INT1_RP_2_GLAZED, item.INT1_RP_2_BOTTOM_RTNR_SEAL, item.INT1_RP_2_END_CAP, item.INT1_RP_2_PANEL_SEQUENCE, item.INT1_RP_2_SMART_COM_CODE, item.INT1_RP_2_DF_SEQ, item.INT1_RP_2_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_1, item.CNC_INT2_RP1, item.PC_INT2_RP1, item.INT2_RP1_PANEL_TYPE, item.INT2_RP_1_ORPHAN, ewOrder.OrderType, item.INT2_RP1_PANEL_CONFIGURATION, item.INT2_RP_1_DOOR_MODEL, item.INT2_RP_1_PANEL_STYLE, item.INT2_RP_1_DOOR_COLOUR, item.INT2_RP_1_DRILL_FOR_HINGES, item.INT2_RP_1_DRILL_CODE, item.INT2_RP_1_GLAZED, item.INT2_RP_1_BOTTOM_RTNR_SEAL, item.INT2_RP_1_END_CAP, item.INT2_RP_1_PANEL_SEQUENCE, item.INT2_RP_1_SMART_COM_CODE, item.INT2_RP_1_DF_SEQ, item.INT2_RP_1_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_2, item.CNC_INT2_RP2, item.PC_INT2_RP2, item.INT2_RP2_PANEL_TYPE, item.INT2_RP_2_ORPHAN, ewOrder.OrderType, item.INT2_RP2_PANEL_CONFIGURATION, item.INT2_RP_2_DOOR_MODEL, item.INT2_RP_2_PANEL_STYLE, item.INT2_RP_2_DOOR_COLOUR, item.INT2_RP_2_DRILL_FOR_HINGES, item.INT2_RP_2_DRILL_CODE, item.INT2_RP_2_GLAZED, item.INT2_RP_2_BOTTOM_RTNR_SEAL, item.INT2_RP_2_END_CAP, item.INT2_RP_2_PANEL_SEQUENCE, item.INT2_RP_2_SMART_COM_CODE, item.INT2_RP_2_DF_SEQ, item.INT2_RP_2_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_1, item.CNC_INT3_RP1, item.PC_INT3_RP1, item.INT3_RP1_PANEL_TYPE, item.INT3_RP_1_ORPHAN, ewOrder.OrderType, item.INT3_RP1_PANEL_CONFIGURATION, item.INT3_RP_1_DOOR_MODEL, item.INT3_RP_1_PANEL_STYLE, item.INT3_RP_1_DOOR_COLOUR, item.INT3_RP_1_DRILL_FOR_HINGES, item.INT3_RP_1_DRILL_CODE, item.INT3_RP_1_GLAZED, item.INT3_RP_1_BOTTOM_RTNR_SEAL, item.INT3_RP_1_END_CAP, item.INT3_RP_1_PANEL_SEQUENCE, item.INT3_RP_1_SMART_COM_CODE, item.INT3_RP_1_DF_SEQ, item.INT3_RP_1_WIDTH_CODE);
+                                    SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_2, item.CNC_INT3_RP2, item.PC_INT3_RP2, item.INT3_RP2_PANEL_TYPE, item.INT3_RP_2_ORPHAN, ewOrder.OrderType, item.INT3_RP2_PANEL_CONFIGURATION, item.INT3_RP_2_DOOR_MODEL, item.INT3_RP_2_PANEL_STYLE, item.INT3_RP_2_DOOR_COLOUR, item.INT3_RP_2_DRILL_FOR_HINGES, item.INT3_RP_2_DRILL_CODE, item.INT3_RP_2_GLAZED, item.INT3_RP_2_BOTTOM_RTNR_SEAL, item.INT3_RP_2_END_CAP, item.INT3_RP_2_PANEL_SEQUENCE, item.INT3_RP_2_SMART_COM_CODE, item.INT3_RP_2_DF_SEQ, item.INT3_RP_2_WIDTH_CODE);
+                                }
+                            }
+                            else
+                            {
+                                WriteLog("Could not get key value from the custom table");
+                            }
+                        }
+                        if (ewOrder.OrderType == "C")
+                        {
+                            if (!string.IsNullOrWhiteSpace(keyvalue))
+                            {
+                                key = Convert.ToInt32(keyvalue);
+                                foreach (var item in ewOrder.DoorItems)
+                                {
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_1_SEC_BDL_RP, item.SEC_1, item.SEC_1_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_1, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_2_SEC_BDL_RP, item.SEC_2, item.SEC_2_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_2, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_3_SEC_BDL_RP, item.SEC_3, item.SEC_3_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_3, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_4_SEC_BDL_RP, item.SEC_4, item.SEC_4_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_4, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_5_SEC_BDL_RP, item.SEC_5, item.SEC_5_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_5, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_6_SEC_BDL_RP, item.SEC_6, item.SEC_6_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_6, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_7_SEC_BDL_RP, item.SEC_7, item.SEC_7_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_7, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_8_SEC_BDL_RP, item.SEC_8, item.SEC_8_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_8, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_9_SEC_BDL_RP, item.SEC_9, item.SEC_9_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_9, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_10_SEC_BDL_RP, item.SEC_10, item.SEC_10_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_10, ewOrder.OrderType);
+                                    SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_BTM_SEC_BDL_RP, item.SEC_BTM, item.SEC_BTM_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_BTM, ewOrder.OrderType);
+                                }
+                            }
+                            else
+                            {
+                                WriteLog("Could not get key value from the custom table");
+                            }
+                        }
+
+                        // Update JDE order header to set SYSEDSP to 2
+                        string sql = "update CRPDTA.F47011 set SYEDSP = '2' where sydoco = " + ewOrder.SalesOrder + " and syedct = 'SZ' and syekco = '00500'";
+                        _jde.ExecuteCommand(sql);
+                    }
+                    else
                     {
                         // Email for RW Config API error
                         SendMail("JDE RW Config API Error for EW Order " + EWOrderNum, result, emailIT);
-                    }
 
-                    await Task.Run(async () =>
-                    {
-                        await Task.Delay(6000);
-                        _ = conceptAccess.updateOrderAsync(in0, ewOrder.SalesOrder, "FM");
-                    }).ConfigureAwait(false);
-                    processed = true;
-
-                    // Update custom table with glazing data
-                    var keyvalue = _jde.GetField("select PCUKID FROM CRPDTA.F574802 order by PCUKID desc");
-                    var key = 0;
-                    if (ewOrder.OrderType == "R")
-                    {
-                        if (!string.IsNullOrWhiteSpace(keyvalue))
-                        {
-                            key = Convert.ToInt32(keyvalue);
-                            foreach (var item in ewOrder.DoorItems)
-                            {
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_1, item.CNC_SB_RP1, item.PC_SB_RP1, item.SB_RP_1_PANEL_TYPE, item.SB_RP_1_ORPHAN, ewOrder.OrderType, item.SB_RP1_PANEL_CONFIGURATION, item.SB_RP_1_DOOR_MODEL, item.SB_RP_1_PANEL_STYLE, item.SB_RP_1_DOOR_COLOUR, item.SB_RP_1_DRILL_FOR_HINGES, item.SB_RP_1_DRILL_CODE, item.SB_RP_1_GLAZED, item.SB_RP_1_BOTTOM_RTNR_SEAL, item.SB_RP_1_END_CAP, item.SB_RP_1_PANEL_SEQUENCE, item.SB_RP_1_SMART_COM_CODE, item.SB_RP_1_DF_SEQ, item.SB_RP_1_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_SB_RP_2, item.CNC_SB_RP2, item.PC_SB_RP2, item.SB_RP_2_PANEL_TYPE, item.SB_RP_2_ORPHAN, ewOrder.OrderType, item.SB_RP2_PANEL_CONFIGURATION, item.SB_RP_2_DOOR_MODEL, item.SB_RP_2_PANEL_STYLE, item.SB_RP_2_DOOR_COLOUR, item.SB_RP_2_DRILL_FOR_HINGES, item.SB_RP_2_DRILL_CODE, item.SB_RP_2_GLAZED, item.SB_RP_2_BOTTOM_RTNR_SEAL, item.SB_RP_2_END_CAP, item.SB_RP_2_PANEL_SEQUENCE, item.SB_RP_2_SMART_COM_CODE, item.SB_RP_2_DF_SEQ, item.SB_RP_2_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_1, item.CNC_INT1_RP1, item.PC_INT1_RP1, item.INT1_RP1_PANEL_TYPE, item.INT1_RP_1_ORPHAN, ewOrder.OrderType, item.INT1_RP1_PANEL_CONFIGURATION, item.INT1_RP_1_DOOR_MODEL, item.INT1_RP_1_PANEL_STYLE, item.INT1_RP_1_DOOR_COLOUR, item.INT1_RP_1_DRILL_FOR_HINGES, item.INT1_RP_1_DRILL_CODE, item.INT1_RP_1_GLAZED, item.INT1_RP_1_BOTTOM_RTNR_SEAL, item.INT1_RP_1_END_CAP, item.INT1_RP_1_PANEL_SEQUENCE, item.INT1_RP_1_SMART_COM_CODE, item.INT1_RP_1_DF_SEQ, item.INT1_RP_1_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_1_RP_2, item.CNC_INT1_RP2, item.PC_INT1_RP2, item.INT1_RP2_PANEL_TYPE, item.INT1_RP_2_ORPHAN, ewOrder.OrderType, item.INT1_RP2_PANEL_CONFIGURATION, item.INT1_RP_2_DOOR_MODEL, item.INT1_RP_2_PANEL_STYLE, item.INT1_RP_2_DOOR_COLOUR, item.INT1_RP_2_DRILL_FOR_HINGES, item.INT1_RP_2_DRILL_CODE, item.INT1_RP_2_GLAZED, item.INT1_RP_2_BOTTOM_RTNR_SEAL, item.INT1_RP_2_END_CAP, item.INT1_RP_2_PANEL_SEQUENCE, item.INT1_RP_2_SMART_COM_CODE, item.INT1_RP_2_DF_SEQ, item.INT1_RP_2_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_1, item.CNC_INT2_RP1, item.PC_INT2_RP1, item.INT2_RP1_PANEL_TYPE, item.INT2_RP_1_ORPHAN, ewOrder.OrderType, item.INT2_RP1_PANEL_CONFIGURATION, item.INT2_RP_1_DOOR_MODEL, item.INT2_RP_1_PANEL_STYLE, item.INT2_RP_1_DOOR_COLOUR, item.INT2_RP_1_DRILL_FOR_HINGES, item.INT2_RP_1_DRILL_CODE, item.INT2_RP_1_GLAZED, item.INT2_RP_1_BOTTOM_RTNR_SEAL, item.INT2_RP_1_END_CAP, item.INT2_RP_1_PANEL_SEQUENCE, item.INT2_RP_1_SMART_COM_CODE, item.INT2_RP_1_DF_SEQ, item.INT2_RP_1_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_2_RP_2, item.CNC_INT2_RP2, item.PC_INT2_RP2, item.INT2_RP2_PANEL_TYPE, item.INT2_RP_2_ORPHAN, ewOrder.OrderType, item.INT2_RP2_PANEL_CONFIGURATION, item.INT2_RP_2_DOOR_MODEL, item.INT2_RP_2_PANEL_STYLE, item.INT2_RP_2_DOOR_COLOUR, item.INT2_RP_2_DRILL_FOR_HINGES, item.INT2_RP_2_DRILL_CODE, item.INT2_RP_2_GLAZED, item.INT2_RP_2_BOTTOM_RTNR_SEAL, item.INT2_RP_2_END_CAP, item.INT2_RP_2_PANEL_SEQUENCE, item.INT2_RP_2_SMART_COM_CODE, item.INT2_RP_2_DF_SEQ, item.INT2_RP_2_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_1, item.CNC_INT3_RP1, item.PC_INT3_RP1, item.INT3_RP1_PANEL_TYPE, item.INT3_RP_1_ORPHAN, ewOrder.OrderType, item.INT3_RP1_PANEL_CONFIGURATION, item.INT3_RP_1_DOOR_MODEL, item.INT3_RP_1_PANEL_STYLE, item.INT3_RP_1_DOOR_COLOUR, item.INT3_RP_1_DRILL_FOR_HINGES, item.INT3_RP_1_DRILL_CODE, item.INT3_RP_1_GLAZED, item.INT3_RP_1_BOTTOM_RTNR_SEAL, item.INT3_RP_1_END_CAP, item.INT3_RP_1_PANEL_SEQUENCE, item.INT3_RP_1_SMART_COM_CODE, item.INT3_RP_1_DF_SEQ, item.INT3_RP_1_WIDTH_CODE);
-                                SetGlazingData(++key, ewOrder.SalesOrder, item.GLZ_CODE_INT_3_RP_2, item.CNC_INT3_RP2, item.PC_INT3_RP2, item.INT3_RP2_PANEL_TYPE, item.INT3_RP_2_ORPHAN, ewOrder.OrderType, item.INT3_RP2_PANEL_CONFIGURATION, item.INT3_RP_2_DOOR_MODEL, item.INT3_RP_2_PANEL_STYLE, item.INT3_RP_2_DOOR_COLOUR, item.INT3_RP_2_DRILL_FOR_HINGES, item.INT3_RP_2_DRILL_CODE, item.INT3_RP_2_GLAZED, item.INT3_RP_2_BOTTOM_RTNR_SEAL, item.INT3_RP_2_END_CAP, item.INT3_RP_2_PANEL_SEQUENCE, item.INT3_RP_2_SMART_COM_CODE, item.INT3_RP_2_DF_SEQ, item.INT3_RP_2_WIDTH_CODE);
-                            }
-                        }
-                        else
-                        {
-                            WriteLog("Could not get key value from the custom table");
-                        }
                     }
-                    if (ewOrder.OrderType == "C")
-                    {
-                        if (!string.IsNullOrWhiteSpace(keyvalue))
-                        {
-                            key = Convert.ToInt32(keyvalue);
-                            foreach (var item in ewOrder.DoorItems)
-                            {
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_1_SEC_BDL_RP, item.SEC_1, item.SEC_1_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_1, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_2_SEC_BDL_RP, item.SEC_2, item.SEC_2_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_2, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_3_SEC_BDL_RP, item.SEC_3, item.SEC_3_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_3, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_4_SEC_BDL_RP, item.SEC_4, item.SEC_4_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_4, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_5_SEC_BDL_RP, item.SEC_5, item.SEC_5_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_5, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_6_SEC_BDL_RP, item.SEC_6, item.SEC_6_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_6, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_7_SEC_BDL_RP, item.SEC_7, item.SEC_7_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_7, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_8_SEC_BDL_RP, item.SEC_8, item.SEC_8_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_8, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_9_SEC_BDL_RP, item.SEC_9, item.SEC_9_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_9, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_10_SEC_BDL_RP, item.SEC_10, item.SEC_10_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_10, ewOrder.OrderType);
-                                SetCommGlazingData(++key, ewOrder.SalesOrder, item.SEC_BTM_SEC_BDL_RP, item.SEC_BTM, item.SEC_BTM_PANEL_QTY, item.PANEL_CONFIGURATION_SEC_BTM, ewOrder.OrderType);
-                            }
-                        }
-                        else
-                        {
-                            WriteLog("Could not get key value from the custom table");
-                        }
-                    }
-
-                    // Update JDE order header to set SYSEDSP to 2
-                    string sql = "update CRPDTA.F47011 set SYEDSP = '2' where sydoco = " + ewOrder.SalesOrder + " and syedct = 'SZ' and syekco = '00500'";
-                    _jde.ExecuteCommand(sql);
                 }
                 else
                 {
@@ -3342,72 +3348,75 @@ namespace RaynorJdeApiDynamicConfigurator
             string bomQuantity;
             List<string> bomItems = [];
             int jdeCount;
-            if (!orderItem.ItemNum.EndsWith("OP10"))
+            if (orderItem != null)
             {
-                BillOfMaterial bom = new() { GridData_1 = [], Parent_ItemNbr = stockcode, Parent_Branch = "50000" };
-                switch (_environment)
+                if (!orderItem.ItemNum.EndsWith("OP10"))
                 {
-                    case "dev":
-                        int bomCount = _syspro.DSet.Tables[table].Rows.Count;
-                        for (int i = 0; i < bomCount; i++)
-                        {
-                            bomItem = _syspro.DSet.Tables[table].Rows[i][0].ToString().Trim();
-                            bomQuantity = _syspro.DSet.Tables[table].Rows[i][1].ToString();
-                            bom.GridData_1.Add(new GridData()
+                    BillOfMaterial bom = new() { GridData_1 = [], Parent_ItemNbr = stockcode, Parent_Branch = "50000" };
+                    switch (_environment)
+                    {
+                        case "dev":
+                            int bomCount = _syspro.DSet.Tables[table].Rows.Count;
+                            for (int i = 0; i < bomCount; i++)
                             {
-                                Quantity = bomQuantity,
-                                Item_NumberG = bomItem
-                            });
-                        }
-                        break;
-                    case "jde":
-                        if (orderItem.BOMs != null)
-                        {
-                            foreach (var item in orderItem.BOMs)
-                            {
-                                if (!item.ItemNum.StartsWith("Cut") && !item.ItemNum.EndsWith("-CUT") && !item.ItemNum.EndsWith("OP10"))
+                                bomItem = _syspro.DSet.Tables[table].Rows[i][0].ToString().Trim();
+                                bomQuantity = _syspro.DSet.Tables[table].Rows[i][1].ToString();
+                                bom.GridData_1.Add(new GridData()
                                 {
-                                    bomItem = item.ItemNum;
-                                    bomQuantity = item.Quantity.ToString();
-                                    bom.GridData_1.Add(new GridData()
+                                    Quantity = bomQuantity,
+                                    Item_NumberG = bomItem
+                                });
+                            }
+                            break;
+                        case "jde":
+                            if (orderItem.BOMs != null)
+                            {
+                                foreach (var item in orderItem.BOMs)
+                                {
+                                    if (!item.ItemNum.StartsWith("Cut") && !item.ItemNum.EndsWith("-CUT") && !item.ItemNum.EndsWith("OP10"))
                                     {
-                                        Quantity = bomQuantity,
-                                        Item_NumberG = bomItem
-                                    });
+                                        bomItem = item.ItemNum;
+                                        bomQuantity = item.Quantity.ToString();
+                                        bom.GridData_1.Add(new GridData()
+                                        {
+                                            Quantity = bomQuantity,
+                                            Item_NumberG = bomItem
+                                        });
 
-                                    // Check Jde for missing bom items and send email - disabled on July 7, 2022
-                                    //jdeCount = _jde.GetTable("SELECT IXKIT,IXKITL,IXAITM,IXQNTY FROM CRPDTA.F3002 where IXMMCU = '       50000' and IXKITL ='" + stockcode + "' and IXAITM = '" + bomItem + "'", "jdeBom");
-                                    //if (jdeCount == 0)
-                                    //{
-                                    //    bomItems.Add(bomItem);
-                                    //}
+                                        // Check Jde for missing bom items and send email - disabled on July 7, 2022
+                                        //jdeCount = _jde.GetTable("SELECT IXKIT,IXKITL,IXAITM,IXQNTY FROM CRPDTA.F3002 where IXMMCU = '       50000' and IXKITL ='" + stockcode + "' and IXAITM = '" + bomItem + "'", "jdeBom");
+                                        //if (jdeCount == 0)
+                                        //{
+                                        //    bomItems.Add(bomItem);
+                                        //}
+                                    }
+                                }
+                                // Send email for missing bom items
+                                if (bomItems.Count > 0)
+                                {
+                                    SendMail("Missing BOM items for EW Order " + EWOrderNum, "Parent stock code: " + bom.Parent_ItemNbr + "<br/>BOM stock codes " + string.Join(", ", [.. bomItems]), emailJdeBom);
                                 }
                             }
-                            // Send email for missing bom items
-                            if (bomItems.Count > 0)
-                            {
-                                SendMail("Missing BOM items for EW Order " + EWOrderNum, "Parent stock code: " + bom.Parent_ItemNbr + "<br/>BOM stock codes " + string.Join(", ", [.. bomItems]), emailJdeBom);
-                            }
-                        }
-                        break;
-                }
+                            break;
+                    }
 
-                if (bom.GridData_1.Count > 0)
-                {
-                    string json = JsonConvert.SerializeObject(bom);
-                    result = SendWebApiMessage(apiUrl + "AddNewBillofMaterial", json).Result;
-                    if (!result.Contains("ERROR"))
+                    if (bom.GridData_1.Count > 0)
                     {
-                        string bomitems = "";
-                        foreach (var item in bom.GridData_1)
+                        string json = JsonConvert.SerializeObject(bom);
+                        result = SendWebApiMessage(apiUrl + "AddNewBillofMaterial", json).Result;
+                        if (!result.Contains("ERROR"))
                         {
-                            bomitems += !string.IsNullOrEmpty(bomitems) ? ", " + item.Item_NumberG : item.Item_NumberG;
-                        }
-                        // Check Jde to get bom items and if not there or a different count send email
-                        jdeCount = _jde.GetTable("SELECT IXKIT,IXKITL,IXAITM,IXQNTY FROM CRPDTA.F3002 where IXMMCU = '       50000' and IXKITL ='" + bom.Parent_ItemNbr + "'", "jdeBom");
-                        if (jdeCount != bom.GridData_1.Count)
-                        {
-                            SendMail("BOM creation failure for EW Order " + EWOrderNum, "Parent stock code: " + bom.Parent_ItemNbr + "<br/>BOM stock codes " + bomitems, emailJdeBom);
+                            string bomitems = "";
+                            foreach (var item in bom.GridData_1)
+                            {
+                                bomitems += !string.IsNullOrEmpty(bomitems) ? ", " + item.Item_NumberG : item.Item_NumberG;
+                            }
+                            // Check Jde to get bom items and if not there or a different count send email
+                            jdeCount = _jde.GetTable("SELECT IXKIT,IXKITL,IXAITM,IXQNTY FROM CRPDTA.F3002 where IXMMCU = '       50000' and IXKITL ='" + bom.Parent_ItemNbr + "'", "jdeBom");
+                            if (jdeCount != bom.GridData_1.Count)
+                            {
+                                SendMail("BOM creation failure for EW Order " + EWOrderNum, "Parent stock code: " + bom.Parent_ItemNbr + "<br/>BOM stock codes " + bomitems, emailJdeBom);
+                            }
                         }
                     }
                 }
@@ -4254,77 +4263,80 @@ namespace RaynorJdeApiDynamicConfigurator
                             {
                                 inputtext += "<br><b>@@Old Sales Order# </b>" + ewOrder.SysproSalesOrder + "<br>";
                             }
-                            doorsize = item.Door.WidthFt + "'" + item.Door.WidthIn + "\"X" + item.Door.HeightFt + "'" + item.Door.HeightIn + "\"(ACTUALDOORSIZE)";
-                            inputtext += "<br><b>@@DOOR</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Model: <b>" + doorItem.GLDoorModel + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Size: <b>" + doorItem.GLDoorSize + "</b>";
-                            inputtext += "<br><b>@@SECTIONS</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Number of Sections: <b>" + doorItem.GLNumberOfSection + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Exterior Colour: <b>" + doorItem.GLDoorColour + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Endcaps/End Stiles: <b>" + doorItem.GLEndCaps + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Style: <b>" + doorItem.GLStyle + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Top Weather Seal: <b>" + doorItem.GLTopWeatherSeal + "</b>";
-                            inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Seal: <b>" + doorItem.GLBottomSeal + "</b>";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GL_ALUM_BTM_SEC_TYPE) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Alumatite Bottom Section Type: <b>" + doorItem.GL_ALUM_BTM_SEC_TYPE + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLTrussStyle) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Trussing: <b>" + doorItem.GLTrussStyle + "</b>" : "";
-                            inputtext += "<br><b>@@GLAZING</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Glazing Type: <b>";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGlazingType) ? doorItem.GLGlazingType + "</b>" : "None</b>";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GlALumGlazingType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Alum Glazing Type: <b>" + doorItem.GlALumGlazingType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLWindowType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Window Type: <b>" + doorItem.GLWindowType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGlassType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Glass Type: <b>" + doorItem.GLGlassType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFrameColour) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Frame Colour: <b>" + doorItem.GLFrameColour + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLitesPerSpacing) ? "<br>>&nbsp;&nbsp;&nbsp;&nbsp;Lites Per Spacing: <b>" + doorItem.GLLitesPerSpacing + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpacing) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spacing: <b>" + doorItem.GLSpacing + "</b>" : "";
-                            inputtext += "<br><b>@@TRACK</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Hardware Size: <b>";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHardwareSize) ? doorItem.GLHardwareSize + "</b>" : "None</b>";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLiftType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Lift Type: <b>" + doorItem.GLLiftType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHlAmt) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;High Lift Amount: <b>" + doorItem.GLHlAmt + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMountType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Mount Type: <b>" + doorItem.GLMountType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJamb) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Type: <b>" + doorItem.GLJamb + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLShaftType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Shaft Type: <b>" + doorItem.GLShaftType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringRH) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spring RH: <b>" + doorItem.GLSpringRH + "</b>, Desc: <b>" + doorItem.GLSpringRhDesc + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringLH) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spring LH: <b>" + doorItem.GLSpringLH + "</b>, Desc: <b>" + doorItem.GLSpringLhDesc + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLExtensionSpring) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Extension Spring: <b>" + doorItem.GLExtensionSpring + "</b>" : "";
-                            inputtext += "<br><b>@@Rolltite</b><br>&nbsp;&nbsp;&nbsp;&nbsp ";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLInvertedCurtain) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Inverted Cusrtain: <b>" + doorItem.GLInvertedCurtain + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJambType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Type: <b>" + doorItem.GLJambType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSlates) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Slats: <b>" + doorItem.GLSlates + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GlGuides) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Guides: <b>" + doorItem.GlGuides + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLElWl) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;ELWL: <b>" + doorItem.GLElWl + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLDrive) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Drive: <b>" + doorItem.GLDrive + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLCurtainRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Cusrtain Ral: <b>" + doorItem.GLCurtainRal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHoodRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Hood Ral: <b>" + doorItem.GLHoodRal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGuidesRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Guides Ral: <b>" + doorItem.GLGuidesRal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFasciaRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Fascia Ral: <b>" + doorItem.GLFasciaRal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLBottomBarRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar Ral: <b>" + doorItem.GLBottomBarRal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJambGuideWS) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Guide Weather Seal: <b>" + doorItem.GLJambGuideWS + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHeaderSeal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Header Seal: <b>" + doorItem.GLHeaderSeal + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLitesType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Vision Lites: <b>" + doorItem.GLLitesType + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLocks) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Locks: <b>" + doorItem.GLLocks + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSlopedBottomBar) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Sloped Bottom bare: <b>" + doorItem.GLSlopedBottomBar + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHood) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Hood: <b>" + doorItem.GLHood + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMasonryClip) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Masonry Clip: <b>" + doorItem.GLMasonryClip + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMountingPlates) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Mounting Plates: <b>" + doorItem.GLMountingPlates + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GlSupportBrackets) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Support Brackets: <b>" + doorItem.GlSupportBrackets + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLPerforatedSlats) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Perforated Slats: <b>" + doorItem.GLPerforatedSlats + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GlBottomBar) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GlBottomBar + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHourRating) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLHourRating + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringCycleLife) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLSpringCycleLife + "</b>" : "";
-                            inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFusibleLink) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLFusibleLink + "</b>" : "";
-
-
-                            //inputtext += "<br>" + item.Description;
-                            if (!string.IsNullOrWhiteSpace(item.Door.WidthFt))
+                            if (item.Door != null)
                             {
-                                TextAttachment textAttachment = new()
+                                doorsize = item.Door.WidthFt + "'" + item.Door.WidthIn + "\"X" + item.Door.HeightFt + "'" + item.Door.HeightIn + "\"(ACTUALDOORSIZE)";
+                                inputtext += "<br><b>@@DOOR</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Model: <b>" + doorItem.GLDoorModel + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Size: <b>" + doorItem.GLDoorSize + "</b>";
+                                inputtext += "<br><b>@@SECTIONS</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Number of Sections: <b>" + doorItem.GLNumberOfSection + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Exterior Colour: <b>" + doorItem.GLDoorColour + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Endcaps/End Stiles: <b>" + doorItem.GLEndCaps + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Style: <b>" + doorItem.GLStyle + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Top Weather Seal: <b>" + doorItem.GLTopWeatherSeal + "</b>";
+                                inputtext += "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Seal: <b>" + doorItem.GLBottomSeal + "</b>";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GL_ALUM_BTM_SEC_TYPE) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Alumatite Bottom Section Type: <b>" + doorItem.GL_ALUM_BTM_SEC_TYPE + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLTrussStyle) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Trussing: <b>" + doorItem.GLTrussStyle + "</b>" : "";
+                                inputtext += "<br><b>@@GLAZING</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Glazing Type: <b>";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGlazingType) ? doorItem.GLGlazingType + "</b>" : "None</b>";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GlALumGlazingType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Alum Glazing Type: <b>" + doorItem.GlALumGlazingType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLWindowType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Window Type: <b>" + doorItem.GLWindowType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGlassType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Glass Type: <b>" + doorItem.GLGlassType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFrameColour) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Frame Colour: <b>" + doorItem.GLFrameColour + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLitesPerSpacing) ? "<br>>&nbsp;&nbsp;&nbsp;&nbsp;Lites Per Spacing: <b>" + doorItem.GLLitesPerSpacing + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpacing) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spacing: <b>" + doorItem.GLSpacing + "</b>" : "";
+                                inputtext += "<br><b>@@TRACK</b><br>&nbsp;&nbsp;&nbsp;&nbsp;Hardware Size: <b>";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHardwareSize) ? doorItem.GLHardwareSize + "</b>" : "None</b>";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLiftType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Lift Type: <b>" + doorItem.GLLiftType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHlAmt) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;High Lift Amount: <b>" + doorItem.GLHlAmt + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMountType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Mount Type: <b>" + doorItem.GLMountType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJamb) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Type: <b>" + doorItem.GLJamb + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLShaftType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Shaft Type: <b>" + doorItem.GLShaftType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringRH) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spring RH: <b>" + doorItem.GLSpringRH + "</b>, Desc: <b>" + doorItem.GLSpringRhDesc + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringLH) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Spring LH: <b>" + doorItem.GLSpringLH + "</b>, Desc: <b>" + doorItem.GLSpringLhDesc + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLExtensionSpring) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Extension Spring: <b>" + doorItem.GLExtensionSpring + "</b>" : "";
+                                inputtext += "<br><b>@@Rolltite</b><br>&nbsp;&nbsp;&nbsp;&nbsp ";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLInvertedCurtain) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Inverted Cusrtain: <b>" + doorItem.GLInvertedCurtain + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJambType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Type: <b>" + doorItem.GLJambType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSlates) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Slats: <b>" + doorItem.GLSlates + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GlGuides) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Guides: <b>" + doorItem.GlGuides + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLElWl) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;ELWL: <b>" + doorItem.GLElWl + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLDrive) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Drive: <b>" + doorItem.GLDrive + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLCurtainRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Cusrtain Ral: <b>" + doorItem.GLCurtainRal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHoodRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Hood Ral: <b>" + doorItem.GLHoodRal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLGuidesRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Guides Ral: <b>" + doorItem.GLGuidesRal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFasciaRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Fascia Ral: <b>" + doorItem.GLFasciaRal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLBottomBarRal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar Ral: <b>" + doorItem.GLBottomBarRal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLJambGuideWS) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Jamb Guide Weather Seal: <b>" + doorItem.GLJambGuideWS + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHeaderSeal) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Header Seal: <b>" + doorItem.GLHeaderSeal + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLitesType) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Vision Lites: <b>" + doorItem.GLLitesType + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLLocks) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Locks: <b>" + doorItem.GLLocks + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSlopedBottomBar) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Sloped Bottom bare: <b>" + doorItem.GLSlopedBottomBar + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHood) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Hood: <b>" + doorItem.GLHood + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMasonryClip) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Masonry Clip: <b>" + doorItem.GLMasonryClip + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLMountingPlates) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Mounting Plates: <b>" + doorItem.GLMountingPlates + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GlSupportBrackets) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Support Brackets: <b>" + doorItem.GlSupportBrackets + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLPerforatedSlats) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Perforated Slats: <b>" + doorItem.GLPerforatedSlats + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GlBottomBar) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GlBottomBar + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLHourRating) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLHourRating + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLSpringCycleLife) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLSpringCycleLife + "</b>" : "";
+                                inputtext += !string.IsNullOrWhiteSpace(doorItem.GLFusibleLink) ? "<br>&nbsp;&nbsp;&nbsp;&nbsp;Bottom Bar: <b>" + doorItem.GLFusibleLink + "</b>" : "";
+
+
+                                //inputtext += "<br>" + item.Description;
+                                if (!string.IsNullOrWhiteSpace(item.Door.WidthFt))
                                 {
-                                    moStructure = "GT4211A",
-                                    moKey = mokey,
-                                    formName = "",
-                                    version = "",
-                                    itemName = "Ack Text",
-                                    inputText = inputtext
-                                };
-                                string json = JsonConvert.SerializeObject(textAttachment);
-                                result = SendWebApiMessage(apiUrl + "addtext", json).Result;
+                                    TextAttachment textAttachment = new()
+                                    {
+                                        moStructure = "GT4211A",
+                                        moKey = mokey,
+                                        formName = "",
+                                        version = "",
+                                        itemName = "Ack Text",
+                                        inputText = inputtext
+                                    };
+                                    string json = JsonConvert.SerializeObject(textAttachment);
+                                    result = SendWebApiMessage(apiUrl + "addtext", json).Result;
+                                }
                             }
                         }
                         catch (Exception ex)
